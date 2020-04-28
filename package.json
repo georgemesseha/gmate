@@ -1,0 +1,23 @@
+{
+  "name": "y",
+  "version": "0.1.0",
+  "description": "A framework for interactively creating, extending and maintaining web application as never easier before while doing it in elegant design patterns.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "keywords": [
+    "api",
+    "web",
+    "nodejs",
+    "generator",
+    "code-gen",
+    "typescript",
+    "javascript"
+  ],
+  "author": "Decova",
+  "license": "ISC",
+  "dependencies": {
+    "gitignore": "^0.6.0"
+  }
+}

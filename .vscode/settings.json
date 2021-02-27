@@ -19,7 +19,8 @@
         "menu.selectionForeground": "#616161",
         "menubar.selectionForeground": "#616161",
         "activityBar.activeBorder": "#616161",
-        "editor.findMatchBorder": "#616161",
-        "selection.background": "#61616140"
-    }
+        "editor.findMatchBorder": "#c4f515",
+        "selection.background": "#fd262640"
+    },
+    "debug.javascript.unmapMissingSources": true
 }

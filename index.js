@@ -1,1 +1,2 @@
-console.log('Work in progress');
+#!/usr/bin/env node
+require('./dist/app.js');

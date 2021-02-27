@@ -1,23 +1,67 @@
 {
-  "name": "y",
-  "version": "0.1.0",
-  "description": "A framework for interactively creating, extending and maintaining web application as never easier before while doing it in elegant design patterns.",
-  "main": "index.js",
-  "scripts": {
-    "test": "node index.js"
-  },
-  "keywords": [
-    "api",
-    "web",
-    "nodejs",
-    "generator",
-    "code-gen",
-    "typescript",
-    "javascript"
-  ],
-  "author": "Decova",
-  "license": "ISC",
-  "dependencies": {
-    "gitignore": "^0.6.0"
-  }
+	"name": "poyka",
+	"version": "0.3.147",
+	"liscense": "",
+	"main": "index.js",
+	"module": "",
+	"description": "A framework for interactively creating, extending and maintaining web application as never easier before while doing it in elegant design patterns.",
+	"sourceMap": true,
+	"inlineSourceMap": false,
+	"outDir": "",
+	"scripts": {
+		"start": "tsc && node ./dist/app.js",
+		"test": "tsc & npm publish & npm i -g poyka & ggg",
+		"build": "tsc & node ./dist/app.js",
+		"push": "tsc & npm publish & npm i -g poyka & ggg"
+	},
+	"files": [
+		"dist",
+		"contents",
+		"index.js",
+		".vscode/tasks.json"
+	],
+	"keywords": [
+		"api",
+		"web",
+		"nodejs",
+		"generator",
+		"code-gen",
+		"typescript",
+		"javascript"
+	],
+	"dependencies": {
+		"chalk": "^4.0.0",
+		"child_process": "^1.0.2",
+		"create-react-app": "^3.4.1",
+		"csharper": "^0.1.21",
+		"decova-dotnet-developer": "^1.3.69",
+		"decova-environment": "0.0.5",
+		"decova-filesystem": "^1.1.50",
+		"decova-json": "0.0.5",
+		"decova-terminal": "^0.1.61",
+		"figlet": "^1.4.0",
+		"filesystem": "^1.0.1",
+		"g": "^2.0.1",
+		"gitignore": "^0.6.0",
+		"inquirer": "^7.1.0",
+		"require": "^2.4.20",
+		"semver": "^7.3.4",
+		"shelljs": "^0.8.4"
+	},
+	"bin": {
+		"pk": "./index.js",
+		"ggg": "./index.js",
+		"k": "./index.js"
+	},
+	"devDependencies": {
+		"@types/figlet": "^1.2.0",
+		"@types/inquirer": "^6.5.0",
+		"@types/jasmine": "^3.5.10",
+		"@types/semver": "^7.3.4",
+		"jasmine": "^3.5.0",
+		"prettier": "^2.0.5",
+		"tslint": "^6.1.2",
+		"tslint-config-prettier": "^1.18.0",
+		"typescript": "^3.8.3"
+	}
 }

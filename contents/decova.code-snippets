@@ -1,0 +1,51 @@
+{
+    "Terminal Mcq Prompt": {
+        "prefix": "ss.terminal.MCQ",
+        "body": [
+            "// npm install --save decova-terminal",
+            "// import { CurrentTerminal as Terminal } from \"decova-terminal/CurrentTerminal\";",
+            "let ops = { ${1:option1}: '${2:option1 text}'};",
+            "let op = await Terminal.McqAsync('${0:question}', ops);",
+            "switch(op)",
+            "{",
+            "\tcase ops.${1:option1}:",
+            "\t\tconsole.log('ops.${1:option1}');",
+            "\t\tbreak;",
+            "}"
+        ],
+        "description": "In CLI tools, it prompts the user to pick a quick option."
+    },
+    "VSCode pick a quick option": {
+        "prefix": "ss.vscode.quickoptions",
+        "body": [
+            "// #region pick an option\r",
+            "\t//#############################################################\r",
+            "\t//import { QuickOption, Extension } from \"decova-vscode\";",
+            "\tenum Options\r",
+            "\t{\r",
+            "\t\tOp1 = `option 1`,\r",
+            "\t\tOp2 = `option 2`\r",
+            "\t}\r",
+            "\tconst options =\r",
+            "\t[\r",
+            "\t\t{Tag:Options.Op1, label: 'option1'},\r",
+            "\t\t{Tag:Options.Op2, label: 'option2'}\r",
+            "\t];\r",
+            "\tExtension.ShowQuickPick.Show(options, (option: QuickOption)=>\r",
+            "\t{\r",
+            "\t\tswitch(option.Tag)\r",
+            "\t\t{\r",
+            "\t\t\tcase Options.Op1:\r",
+            "\t\t\t\twindow.showInformationMessage('option1 Sha3\"al ya m3alem')\r",
+            "\t\t\t\tbreak;\r",
+            "\t\t\tcase Options.Op2:\r",
+            "\t\t\t\twindow.showInformationMessage('option2 Sha3\"al ya m3alem')\r",
+            "\t\t\t\tbreak;\r",
+            "\t\t}\r",
+            "\t});\r",
+            "\t//#############################################################\r",
+            "\t// #endregion"
+        ],
+        "description": "In VSCode extension, it prompts the VSCode user to pick a quick option."
+    }
+}

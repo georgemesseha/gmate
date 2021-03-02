@@ -22,7 +22,7 @@
                     "type": "string",
                     "description": "Applicable only if the step is Prompt/*. And hence the VarName resembles the name of the variable will carry the user input."
                 },
-                "DiplayText": {
+                "DisplayText": {
                     "type": "string",
                     "description": "The user friendly text to be displayed describing the objective of the step"
                 },
@@ -36,7 +36,7 @@
                 }
             },
 
-            "required": ["IsActive", "DiplayText", "Composer"]
+            "required": ["IsActive", "DisplayText", "Composer"]
         },
         "SCH_Walkthrough": {
             "properties": {

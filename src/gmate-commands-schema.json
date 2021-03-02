@@ -12,7 +12,7 @@
                 },
                 "Type": {
                     "type": "string",
-                    "enum": ["Prompot", "Command", "Instruction"]
+                    "enum": ["Prompt", "Command", "Instruction"]
                 },
                 "RunOnlyIf": {
                     "type": "string",

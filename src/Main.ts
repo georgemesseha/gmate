@@ -8,7 +8,7 @@ import { InsideExistingProject as InsideCurrentProject } from "./InsideExistingP
 import { NewProject } from "./NewProject";
 import { DirectoryInfo, FileInfo } from "decova-filesystem";
 import * as inquirer from "inquirer";
-import { XString } from "decova-dotnet-developer";
+import { Dictionary, XString } from "decova-dotnet-developer";
 
 
 
@@ -16,7 +16,7 @@ import path from "path";
 import { WorkspaceAugmenter as WorkspaceAugmenter } from "./WorkspaceAugmenter";
 import { List } from "decova-dotnet-developer";
 import { Intellisense } from "./Intellisense";
-import { DB, InstructionType } from "./DB";
+import { DB, ICmdSheet, InstructionType, IStep, IWalkthrough, StepType } from "./DB";
 import os from "os";
 
 
@@ -28,28 +28,9 @@ enum NextStepPrompt
     Abort='Abort'
 }
 
-export interface IInstruction
-{
-    Command: string,
-    WillDo: string,
-    Type: InstructionType,
-}
-
-export interface IBatch
-{
-    Description: string;
-    Commands: IInstruction[];
-}
-
-export interface ICmdSheet
-{
-    CreateOn: string;
-    Batches: IBatch[];
-}
-
 export default class Main
 {
-    private _allOptions: List<IInstruction> = new List<IInstruction>();
+    private _allWalkthroughs: List<IWalkthrough> = new List<IWalkthrough>();
 
     private DisplayCurrentDirectory()
     {
@@ -93,49 +74,65 @@ export default class Main
         return;
     }
 
-    private get LocalCommandsFile(): FileInfo
+    private async HandlePromptText(prompt: IStep, vars: Dictionary<string, string>)
     {
-       return new FileInfo(path.join(__dirname, 'command-sheet.json'));
-    }
+        const ans = await Terminal.AskForTextAsync(prompt.DisplayText);
+        
+        const hasPattern = new XString(ans).IsNullOrWhiteSpace() == false;
+        const pattern = new RegExp(ans);
 
-    private async ReloadCommands(forceDownload:boolean=false)
-    {
-        this._allOptions.Add({Id:-1, Type: InstructionType.Command, CliCommand: '', Description: '>> Reload commands'})
-        this._allOptions.Add({Id:-2, Type: InstructionType.Command, CliCommand: '', Description: '>> Open old Poyka tree'})
-    
-        let onlineOnes:List<IInstruction>;
-        if(this.LocalCommandsFile.Exists() == false || forceDownload)
+        if(hasPattern && pattern.test(ans.trim()) == false)
         {
-            const  = await (await DB.GetAllCommands()).First() as ICmdSheet;
-            const content = JSON.stringify(onlineOnes);
-            this.LocalCommandsFile.WriteAllText(content);
-        }
-        else
-        {
-            this.LocalCommandsFile.ReadAllText()
+            await Terminal.DisplayErrorAsync(`[${prompt.VarName}] doesn't match the pattern /${prompt.Regex}/g!`);
+            await this.HandlePromptText(prompt, vars);
         }
         
-        this._allOptions.AddRange(onlineOnes);
+        vars.Ensure(prompt.VarName, ans);
     }
 
-    private async HanldeCommandBatch(cmd: IInstruction): Promise<NextStepPrompt>
+    private async HandleMcq(prompt: IStep)
     {
-        Terminal.DisplayInfo(cmd.Description);
-        Terminal.DisplayInfo(cmd.CliCommand);
+        
+    }
+
+    private async HanldeWalkthrough(wk: IWalkthrough): Promise<NextStepPrompt>
+    {
+        Terminal.DisplayInfo(wk.DisplayText);
+        wk.Steps.forEach(step => 
+        {
+            const vars = new Dictionary<string, string>();
+            switch(step.Type)
+            {
+                case StepType.Command:
+                    break;
+                case StepType.Mcq:
+                    break;
+                case StepType.Prompt_Boolean:
+                    break;
+                case StepType.Prompt_Number:
+                    break;
+                case StepType.Prompt_Text:
+                    break;
+            }
+            Terminal.DisplayInfo(step.DisplayText);
+            Terminal.DisplayInfo(step.DisplayText);
+        });
+
+        
        
         let op = await Terminal.McqAsync('Ready?', NextStepPrompt);
         switch(op)
         {
             case NextStepPrompt.Go:
-                switch(cmd.Type)
+                switch(wk.Type)
                 {
                     case InstructionType.Instruction:
-                        await Terminal.InstructAsync(cmd.CliCommand);
+                        await Terminal.InstructAsync(wk.CliCommand);
                         break;
                     
                     case InstructionType.Command:
                     default:
-                        Terminal.Exec(cmd.CliCommand);
+                        Terminal.Exec(wk.CliCommand);
                         break;
                 }
                 break;
@@ -152,35 +149,16 @@ export default class Main
         return op;
     }
 
+    private _sheet: ICmdSheet|null = null;
+
     public async TakeControl()
     {
-       // #region startup
-       this.DisplayCurrentDirectory();
-       if(this._allOptions.Count == 0)
-       {
-           await this.ReloadCommands();
-       }
-       // #endregion
+       await DB.GetSheetAsync(false);
 
-       // #region prompt
-       const intelli = new Intellisense<IInstruction>(this._allOptions, (op)=>op.Description)
+       const allWks = new List<IWalkthrough>(this._sheet?.Walkthroughs);
+
+       const intelli = new Intellisense<IWalkthrough>(allWks, (op)=>op.DisplayText)
        let ans = await intelli.Prompt()
-       // #endregion
-
-       switch(ans.Id)
-       {
-           case -2:
-               await this.DoOldBranching();
-               break;
-
-            case -1:
-                await this.ReloadCommands();
-                await this.TakeControl();
-                break;
-
-            default:
-                await this.HanldeCommandBatch(ans);
-                break;
-       }
+       await this.HanldeWalkthrough(ans)
     }
 }  

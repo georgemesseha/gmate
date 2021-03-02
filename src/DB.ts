@@ -3,36 +3,71 @@
 import { List } from "decova-dotnet-developer";
 import { CurrentTerminal } from "decova-terminal";
 import mongoose from "mongoose";
+import { FileInfo } from "decova-filesystem";
+import { Json } from 'decova-json'
+import path from 'path'
 
-// const uri = `mongodb+srv://aipianist:poykaIsGreat@poykacommandsheet.yw0ri.mongodb.net/CommandSheet?retryWrites=true&w=majority`;
+
+
 const uri = "mongodb+srv://aipianist:poykaIsGreat@cluster0.bdjm4.mongodb.net/GMate?retryWrites=true&w=majority";
+
+export enum StepType
+{
+    Command = "Command",
+    Prompt = "Prompt",
+    Instruction = "Instruction" 
+}
+export interface IStep
+{
+    IsActive: boolean;
+    RunOnlyIf: string;
+    Type: StepType,
+    VarName: string,
+    DisplayText: string,
+    Regex: string,
+    Options: string[],
+    Composer: string
+}
+export interface IWalkthrough
+{
+    IsActive: boolean,
+    DisplayText: string,
+    Steps: IStep[];
+}
+export interface ICmdSheet
+{
+    CreatedOn: Date,
+    Walkthroughs: IWalkthrough[]
+}
 export enum InstructionType
 {
     Command,
     Instruction,
+    Prompt
 }
 
 
 export class DB
 {
-    public static async GetAllCommands(): Promise<List<ICmd>>
+    private static get LocalCacheFile(): FileInfo
     {
-        try
-        {
-            await mongoose.connect(uri,
-                {
-                    useUnifiedTopology: true,
-                    useNewUrlParser: true,
+       return new FileInfo(path.join(__dirname, 'command-sheet.json'));
+    }
 
-                });
-        } 
-        catch (err)
+    public static get IsCached():boolean
+    {
+        return this.LocalCacheFile.Exists();
+    }
+
+    public static async GetSheetAsync(forceRedownload: boolean): Promise<ICmdSheet>
+    {
+        if(DB.IsCached == false || forceRedownload)
         {
-            CurrentTerminal.DisplayErrorAsync("Couldn't connect to Mongo!")
-            return new List<ICmd>();
+            const sheetUrl = `https://raw.githubusercontent.com/georgemesseha/gmate/master/src/gmate-commands-sheet.json`;
+            await FileInfo.DownloadAsync(sheetUrl, this.LocalCacheFile.FullName);
         }
 
-        const query = mongoose.connection.db.collection('CommandSheet').find({});
-        return new List<ICmd>(await query.toArray());
-    }
+        const sheetContent = this.LocalCacheFile.ReadAllText();
+        return Json.Parse<ICmdSheet>(sheetContent)
+    } 
 }

@@ -12,7 +12,7 @@
                 },
                 "Type": {
                     "type": "string",
-                    "enum": ["Prompot-Text", "Prompt-Boolean", "Prompt-Number", "Mcq", "Command", "Instruction"]
+                    "enum": ["Prompot", "Command", "Instruction"]
                 },
                 "RunOnlyIf": {
                     "type": "string",
@@ -21,6 +21,10 @@
                 "VarName": {
                     "type": "string",
                     "description": "Applicable only if the step is Prompt/*. And hence the VarName resembles the name of the variable will carry the user input."
+                },
+                "Regex": {
+                    "type": "string",
+                    "description": "Applicable only if the step is Prompt/*. It validate the GMate user answer against the regular expression."
                 },
                 "DisplayText": {
                     "type": "string",
@@ -69,5 +73,5 @@
             } 
         }
     },
-    "required": ["CreatedOn", "Walkthroughs"]
+    "required": ["CreatedOn", "DisplayText", "Walkthroughs"]
 }

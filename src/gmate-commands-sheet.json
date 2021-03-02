@@ -1,48 +1,174 @@
 {
-    "CreatedOn": "2021-02-27 9:42",
-    "Batches": 
-    [
+    "$schema": "https://raw.githubusercontent.com/georgemesseha/gmate/master/src/gmate-commands-schema.json",
+    "CreatedOn": "2021-02-27 09:42:30",
+    "Walkthroughs": [
         {
             "IsActive": true,
-            "Description": "Find the process using a specific port",
-            "Steps": 
-            [
+            "DisplayText": "Find the process using a specific port",
+            "Steps": [
                 {
                     "IsActive": true,
                     "RunOnlyIf": "",
-                    "Type": "Prompt-Number",
-                    
+                    "Type": "Prompt",
                     "VarName": "port",
                     "DisplayText": "Port #",
                     "Options": [],
-                    "Composer": "()=> 'netstat -ano | findstr :<<port>>'"                 
+                    "Composer": "()=> 'netstat -ano | findstr :<<port>>'"
                 },
                 {
                     "IsActive": true,
                     "RunOnlyIf": "",
                     "Type": "Command",
-                    
                     "VarName": "",
                     "DisplayText": "Will find the ID of the process using a specific port.",
                     "Options": [],
-                    "Composer": "()=> `netstat -ano | findstr :<<port>>`"                 
+                    "Composer": "()=> `netstat -ano | findstr :<<port>>`"
                 }
             ]
         },
         {
-            "IsActive": false,
-            "Description": "Find the process acquired a specific port",
-            "Steps": 
-            [
+            "IsActive": true,
+            "DisplayText": "vscode >> install & build & patch++ & publish #increment#push)",
+            "Steps": [
                 {
-                    "IsActive": false,
-                    "RunOnlyIf": "e.g. ()=> someVariable != null",
-                    "Type": "Instruction|Command|Prompt-String|Prompt-Number|Prompt-Mcq",
-                    
-                    "VarName": "In case it's a prompt, it resembles the var name.",
-                    "DisplayText": "@Prompt/What is required from the user | @Command:What the command will do | @Instruction: will be neglected",
-                    "Options": ["A list of the expected values. Has meaning only in Prompt/*. Is applied only if there is a set of expected results"],
-                    "Composer": "@Type=Prompt/*: It composes the final text should contribute to a command/instruction. In case it's empty, the VarName is taken. In case it's a command it composes the command and it may use the previous steps if any."                 
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will install the missing packages & update the outdated ones.",
+                    "Composer": "npm install"
+                },
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will compile TypeScript",
+                    "Composer": "tsc"
+                },
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will increment the version's path no. of the current workspace's package.json",
+                    "Composer": "gmate patch++"
+                },
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will publish the currently developed package to npm repo.",
+                    "Composer": "npm publish"
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "DisplayText": "vscode >> Writing Extension >> Pack your extension",
+            "Steps": [
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will compile TypeScript",
+                    "Composer": "tsc"
+                },
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will increment the version's path no. of the current workspace's package.json",
+                    "Composer": "gmate patch++"
+                },
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will package the extension locally as vsix",
+                    "Composer": "vsce package"
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "DisplayText": "npm >> List direct dependencies",
+            "Steps": [
+                {
+                    "IsActive": true,
+                    "DisplayText": "Will list the direct dependencies of the currently developed package.",
+                    "Type": "Command",
+                    "Composer": "npm list --depth=0"
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "DisplayText": "npm >> List globally installed packages",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "IsActive": true,
+                    "DisplayText": "Will list the globally installed packages.",
+                    "Composer": "npm list --global --depth=0"
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "DisplayText": "GMate >> Increment Patch Number",
+            "Steps": [
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will increment the patch number of the currently developed package",
+                    "Composer": "gmate patch++"
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "DisplayText": "npm >> Find unused and missing dependencies/packages",
+            "Steps": [
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will find the unused and missing dependencies/packages",
+                    "Composer": "depcheck"
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "DisplayText": "Find the process using a specific port",
+            "Steps": [
+                {
+                    "IsActive": true,
+                    "Type": "Prompt",
+                    "Regex": "[0-9]{2,}",
+                    "VarName": "port",
+                    "DisplayText": "Port #",
+                    "Composer": ""
+                },
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will find the process using the provided port (if any)",
+                    "Composer": "()=> 'netstat -ano | findstr :<<port>>'"
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "DisplayText": "GMate >> CmdSheet >> Reload #commands#data",
+            "Steps": [
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "Will reload Walkthrough sheet",
+                    "Composer": "gmate reload-walkthrough-sheet"  
+                }
+            ]
+        },
+        {
+            "IsActive": true,
+            "Type": "Command",
+            "Steps": [
+                {
+                    "IsActive": true,
+                    "Type": "Command",
+                    "DisplayText": "GMate >> Old Poyka >> Open #legacy",
+                    "Composer": "gmate open-old-poyka"
                 }
             ]
         }

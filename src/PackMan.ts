@@ -105,7 +105,7 @@ export class PackMan
         {
             this._manifest = Json.Load<PackageManifest>(this._filePath);
         }
-        catch(error:any)
+        catch(error)
         {
             throw new Exception(`Couldn't load configuration file`, error as Exception);
         }

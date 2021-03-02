@@ -1,0 +1,73 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://decova.com/gmate-commandsheet.json",
+    "title": "Product",
+    "description": "Describes the GMate CommandSheet contents",
+    "definitions": {
+        "SCH_Step": {
+            "type": "object",
+            "properties": {
+                "IsActive": {
+                    "type": "boolean"
+                },
+                "Type": {
+                    "type": "string",
+                    "enum": ["Prompot-Text", "Prompt-Boolean", "Prompt-Number", "Mcq", "Command", "Instruction"]
+                },
+                "RunOnlyIf": {
+                    "type": "string",
+                    "description": "A JS function that evaluates to boolean describes whether this step will run or not. Previous steps VarNames is typically used to author the function."
+                },
+                "VarName": {
+                    "type": "string",
+                    "description": "Applicable only if the step is Prompt/*. And hence the VarName resembles the name of the variable will carry the user input."
+                },
+                "DiplayText": {
+                    "type": "string",
+                    "description": "The user friendly text to be displayed describing the objective of the step"
+                },
+                "Options": {
+                    "type": "array",
+                    "description": "Only in the case that only there is a specific set of values, the user should select from."
+                },
+                "Composer": {
+                    "type": "string",
+                    "description": "A java script function composes the output of the step"
+                }
+            },
+
+            "required": ["IsActive", "DiplayText", "Composer"]
+        },
+        "SCH_Walkthrough": {
+            "properties": {
+                "IsActive": {
+                    "type": "boolean",
+                    "description": "Dictates if this Walkthrough should be considered or negelected by GMate"
+                },
+                "DisplayText": {
+                    "type": "string",
+                    "description": "The user friendly description of what the objective of the Walkthrough. This text is one will be searched by GMate."
+                },
+                "Steps": {
+                    "type": "array",
+                    "items": { "$ref": "SCH_Step" }
+                }
+            }
+        }
+    },
+    "type": "object",
+    "properties": {
+        "CreatedOn": {
+            "type": "string",
+            "description": "The datetime this version of the CommandSheet is created .",
+            "pattern": "^[0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2} [0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2}" 
+        },
+        "Walkthroughs": {
+            "type": "array",
+            "items": {
+                "$ref": "SCH_Walkthrough"
+            } 
+        }
+    },
+    "required": ["CreatedOn", "Walkthroughs"]
+}

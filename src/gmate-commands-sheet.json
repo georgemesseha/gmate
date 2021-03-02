@@ -1,0 +1,50 @@
+{
+    "CreatedOn": "2021-02-27 9:42",
+    "Batches": 
+    [
+        {
+            "IsActive": true,
+            "Description": "Find the process using a specific port",
+            "Steps": 
+            [
+                {
+                    "IsActive": true,
+                    "RunOnlyIf": "",
+                    "Type": "Prompt-Number",
+                    
+                    "VarName": "port",
+                    "DisplayText": "Port #",
+                    "Options": [],
+                    "Composer": "()=> 'netstat -ano | findstr :<<port>>'"                 
+                },
+                {
+                    "IsActive": true,
+                    "RunOnlyIf": "",
+                    "Type": "Command",
+                    
+                    "VarName": "",
+                    "DisplayText": "Will find the ID of the process using a specific port.",
+                    "Options": [],
+                    "Composer": "()=> `netstat -ano | findstr :<<port>>`"                 
+                }
+            ]
+        },
+        {
+            "IsActive": false,
+            "Description": "Find the process acquired a specific port",
+            "Steps": 
+            [
+                {
+                    "IsActive": false,
+                    "RunOnlyIf": "e.g. ()=> someVariable != null",
+                    "Type": "Instruction|Command|Prompt-String|Prompt-Number|Prompt-Mcq",
+                    
+                    "VarName": "In case it's a prompt, it resembles the var name.",
+                    "DisplayText": "@Prompt/What is required from the user | @Command:What the command will do | @Instruction: will be neglected",
+                    "Options": ["A list of the expected values. Has meaning only in Prompt/*. Is applied only if there is a set of expected results"],
+                    "Composer": "@Type=Prompt/*: It composes the final text should contribute to a command/instruction. In case it's empty, the VarName is taken. In case it's a command it composes the command and it may use the previous steps if any."                 
+                }
+            ]
+        }
+    ]
+}

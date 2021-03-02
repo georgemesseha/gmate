@@ -24,7 +24,7 @@ WorkspaceAugmenter.EnsureWorkspaceAugmented();
 
 if(Process.Current.Args.Count === 0)
 {
-    Main.TakeControl();
+    new Main().TakeControl();
 }
 else
 {

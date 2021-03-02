@@ -1,6 +1,6 @@
 {
 	"name": "poyka",
-	"version": "0.3.147",
+	"version": "0.3.148",
 	"liscense": "",
 	"main": "index.js",
 	"module": "",
@@ -41,9 +41,13 @@
 		"decova-terminal": "^0.1.61",
 		"figlet": "^1.4.0",
 		"filesystem": "^1.0.1",
+		"fuzzy": "^0.1.3",
 		"g": "^2.0.1",
 		"gitignore": "^0.6.0",
 		"inquirer": "^7.1.0",
+		"inquirer-autocomplete-prompt": "^1.3.0",
+		"mongoose": "^5.11.18",
+		"os": "^0.1.1",
 		"require": "^2.4.20",
 		"semver": "^7.3.4",
 		"shelljs": "^0.8.4"

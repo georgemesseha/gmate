@@ -56,7 +56,9 @@
                     "type": "array",
                     "items": { "$ref": "#/definitions/SCH_Step" }
                 }
-            }
+            },
+            "required": ["Steps", "DisplayText", "IsActive"]
+
         }
     },
     "type": "object",
@@ -73,5 +75,5 @@
             } 
         }
     },
-    "required": ["CreatedOn", "DisplayText", "Walkthroughs"]
+    "required": ["CreatedOn", "Walkthroughs"]
 }

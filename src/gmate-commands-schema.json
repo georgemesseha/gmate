@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "http://decova.com/gmate-commandsheet.json",
+    "$id": "http://decova.com/gmate-commandsheet.jsonhttps://raw.githubusercontent.com/georgemesseha/gmate/master/src/gmate-commands-schema.json",
     "title": "Product",
     "description": "Describes the GMate CommandSheet contents",
     "definitions": {
@@ -50,7 +50,7 @@
                 },
                 "Steps": {
                     "type": "array",
-                    "items": { "$ref": "SCH_Step" }
+                    "items": { "$ref": "#/definitions/SCH_Step" }
                 }
             }
         }
@@ -65,7 +65,7 @@
         "Walkthroughs": {
             "type": "array",
             "items": {
-                "$ref": "SCH_Walkthrough"
+                "$ref": "#/definitions/SCH_Walkthrough"
             } 
         }
     },

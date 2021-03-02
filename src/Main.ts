@@ -9,6 +9,7 @@ import { NewProject } from "./NewProject";
 import { DirectoryInfo, FileInfo } from "decova-filesystem";
 import * as inquirer from "inquirer";
 import { Dictionary, XString } from "decova-dotnet-developer";
+import { Exception } from "decova-dotnet-developer";
 
 
 
@@ -18,14 +19,15 @@ import { List } from "decova-dotnet-developer";
 import { Intellisense } from "./Intellisense";
 import { DB, ICmdSheet, InstructionType, IStep, IWalkthrough, StepType } from "./DB";
 import os from "os";
+import { underline } from "chalk";
 
 
 
 enum NextStepPrompt
 {
-    Go='Go',
-    Skip='Skip',
-    Abort='Abort'
+    Go = 'Go',
+    Skip = 'Skip',
+    Abort = 'Abort'
 }
 
 export default class Main
@@ -77,88 +79,157 @@ export default class Main
     private async HandlePromptText(prompt: IStep, vars: Dictionary<string, string>)
     {
         const ans = await Terminal.AskForTextAsync(prompt.DisplayText);
-        
+
         const hasPattern = new XString(ans).IsNullOrWhiteSpace() == false;
         const pattern = new RegExp(ans);
 
-        if(hasPattern && pattern.test(ans.trim()) == false)
+        if (hasPattern && pattern.test(ans.trim()) == false)
         {
             await Terminal.DisplayErrorAsync(`[${prompt.VarName}] doesn't match the pattern /${prompt.Regex}/g!`);
             await this.HandlePromptText(prompt, vars);
         }
-        
+
         vars.Ensure(prompt.VarName, ans);
     }
 
-    private async HandleMcq(prompt: IStep)
+    private async HandleMcq(prompt: IStep, vars: Dictionary<string, string>)
     {
-        
+        const options = new List<any>(prompt.Options.map(op => { label: op }))
+        const intelli = new Intellisense(options, (op) => op.label)
+        const ans = await intelli.Prompt()
+
+        vars.Ensure(prompt.VarName, ans)
     }
 
-    private async HanldeWalkthrough(wk: IWalkthrough): Promise<NextStepPrompt>
+    private async ShowContinueSkip(): Promise<boolean>
     {
-        Terminal.DisplayInfo(wk.DisplayText);
-        wk.Steps.forEach(step => 
+        const options = new List<any>(['Continue', 'Skip'])
+        const intelli = new Intellisense(options, (op) => op)
+        const ans = await intelli.Prompt();
+
+        switch(ans)
         {
-            const vars = new Dictionary<string, string>();
-            switch(step.Type)
-            {
-                case StepType.Command:
-                    break;
-                case StepType.Mcq:
-                    break;
-                case StepType.Prompt_Boolean:
-                    break;
-                case StepType.Prompt_Number:
-                    break;
-                case StepType.Prompt_Text:
-                    break;
-            }
-            Terminal.DisplayInfo(step.DisplayText);
-            Terminal.DisplayInfo(step.DisplayText);
+            case 'Continue':
+                return true;
+            case 'Skip':
+            default:
+                return false;
+        }
+    }
+
+
+    private async CompileScript(composer: string, vars: Dictionary<string, string>): Promise<string>
+    {
+        let output = new XString(composer.trim());
+        vars?.Items.Items.forEach(kv =>
+        {
+            output = output.ReplaceAll(`<<${kv.Key}>>`, kv.Value);
         });
 
-        
-       
-        let op = await Terminal.McqAsync('Ready?', NextStepPrompt);
-        switch(op)
+        try
         {
-            case NextStepPrompt.Go:
-                switch(wk.Type)
+            if (output.StartsWith("("))
+            {
+                const func = eval(output.Value);
+                if(func?.constructor != Function)
                 {
-                    case InstructionType.Instruction:
-                        await Terminal.InstructAsync(wk.CliCommand);
-                        break;
-                    
-                    case InstructionType.Command:
-                    default:
-                        Terminal.Exec(wk.CliCommand);
-                        break;
+                    throw new Exception(`The provided script cannot be compiled [${composer}]`)
                 }
-                break;
- 
-            case NextStepPrompt.Skip:
-                Terminal.DisplayErrorAsync('---- Skipped ----');
-                break;
 
-            default:
-                Terminal.DisplayErrorAsync('---- Aborted ----');
-                return op;
+                output = (func as Function)();
+            }
+        } 
+        catch (err)
+        {
+            throw new Exception(`The provided composer execution raised an exception: [${composer}]`, new Exception(err));
         }
 
-        return op;
+        return output.Value;
     }
 
-    private _sheet: ICmdSheet|null = null;
+    private async HandleCommand(command: IStep, vars: Dictionary<string, string>)
+    {
+        await Terminal.InstructAsync(command.DisplayText, undefined)
+
+        const output = await this.CompileScript(command.Composer, vars);
+        const ans = await this.ShowContinueSkip()
+
+        if(ans)
+        {
+            Terminal.Exec(output)
+        }
+        else
+        {
+            await Terminal.DisplayErrorAsync("Command skipped!")
+        }
+    }
+
+    private async HandleInstruction(instruction: IStep, vars: Dictionary<string, string>)
+    {
+        await Terminal.InstructAsync(instruction.DisplayText, undefined)
+
+        let output = await this.CompileScript(instruction.Composer, vars) 
+        await Terminal.InstructAsync(output, undefined)
+        
+        const ans = await this.ShowContinueSkip()
+        if(ans)
+        {
+            await Terminal.DisplayErrorAsync("Done!")
+        }
+        else
+        {
+            await Terminal.DisplayErrorAsync("Instruction skipped!")
+        }
+    }
+
+    private async HanldeWalkthrough(wk: IWalkthrough)
+    {
+        Terminal.DisplayInfo(wk.DisplayText);
+        const vars = new Dictionary<string, string>();
+
+        for(let step of wk.Steps) 
+        {
+            if(step.IsActive == false) continue;
+            if(step.RunOnlyIf)
+            {
+
+            }
+
+            switch (step.Type)
+            {
+                case StepType.Prompt:
+                    
+                    if (step.Options?.length > 0)
+                    {
+                        this.HandleMcq(step, vars)
+                    }
+                    else
+                    {
+                        this.HandlePromptText(step, vars)
+                    }
+                    break;
+
+                case StepType.Command:
+                    this.HandleCommand(step, vars)
+                    break;
+
+                case StepType.Instruction:
+                    this.HandleInstruction(step, vars)
+                    break;
+            }
+        };
+    }
+
+    private _sheet: ICmdSheet | null = null;
 
     public async TakeControl()
     {
-       await DB.GetSheetAsync(false);
+        await DB.GetSheetAsync(false);
 
-       const allWks = new List<IWalkthrough>(this._sheet?.Walkthroughs);
+        const allWks = new List<IWalkthrough>(this._sheet?.Walkthroughs);
 
-       const intelli = new Intellisense<IWalkthrough>(allWks, (op)=>op.DisplayText)
-       let ans = await intelli.Prompt()
-       await this.HanldeWalkthrough(ans)
+        const intelli = new Intellisense<IWalkthrough>(allWks, (op) => op.DisplayText)
+        let ans = await intelli.Prompt()
+        await this.HanldeWalkthrough(ans)
     }
 }  

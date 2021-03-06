@@ -1,3 +1,4 @@
+import { BackgroundColor } from "chalk";
 import { List } from "decova-dotnet-developer";
 import { Process } from "decova-environment";
 import { DirectoryInfo, FileInfo, Path } from "decova-filesystem";
@@ -8,6 +9,7 @@ import { ILocalTool } from "./LocalToolsDispatcher";
 
 import { DecovaSettings } from "./Techies/DecovaSpecific/DecovaSettings";
 import { PackageJson } from "./Techies/Package-General/PackageJson";
+import { PackMan } from "./Techies/PackMan";
 import { PathMan } from "./Techies/PathMan";
 
 export class LTool_IncrementPatch implements ILocalTool
@@ -43,26 +45,40 @@ export class LTool_IncrementPatch implements ILocalTool
 
         if(ans == "Yes")
         {
-            await this.UpdateDependentWorkspaces();
+           const success: boolean = await this.UpdateDependentWorkspacesAsync(); 
+           if(success)
+           {
+               TerminalAgent.ShowSuccess('Dependents have been updated with the patch successfuly')
+           }
         }
     }
 
-    private async EnsureDecovaSetting()
+    
+    private async UpdateDependentWorkspacesAsync(): Promise<boolean>
     {
-        TerminalAgent.Exec(`ggg `)
-    }
+        await DecovaSettings.EnsureInCurrentWorkspace();
+       
 
-    private async UpdateDependentWorkspaces()
-    {
-        let decovaSettings = DecovaSettings.LoadOfCurrentWorkspace();
-        while (!decovaSettings)
+        let packMan: PackMan;
+        try
         {
-            this.EnsureDecovaSetting();
-            decovaSettings = DecovaSettings.LoadOfCurrentWorkspace();
+            packMan = new PackMan(DirectoryInfo.Current.FullName)
+        }
+        catch(err)
+        {
+            TerminalAgent.ShowError(`Couldn't load package.json from current directory [${DirectoryInfo.Current.FullName}]`)
+            return false;
         }
 
-        const supposedFilePath = PathMan.GotchaLocalRepo_DecovaSettingsFile;
-        TerminalAgent.ShowError(`File not found [${supposedFilePath.FullName}]`);
-
+        try
+        {
+            packMan.UpdateLeastVersionOnDependents();
+            return true;
+        }
+        catch(error)
+        {
+            TerminalAgent.ShowError(`Couldn't update some or all of dependent packages with the patch`)
+            return false;
+        }
     }
 }

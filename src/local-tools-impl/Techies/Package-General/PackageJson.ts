@@ -41,6 +41,14 @@ export class PackageJson
     {
         return Dictionary.FromObjectProps<string>(this.dependencies);
     }
+
+    public HasAsDependency(depName: string)
+    {
+        return new List<string>(Object.getOwnPropertyNames(this.dependencies))
+                .Any(p => p == depName) 
+    }
+
+
     public bin: object = new Object();
     public get Bin(): Dictionary<string, string>
     {

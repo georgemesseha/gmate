@@ -4,6 +4,17 @@ import { CommonMenu } from "../local-tools-impl/Techies/CommonMenu";
 
 export class TerminalAgent
 {
+    public static ShowSuccess(text: string)
+    {
+        CurrentTerminal.Echo(` ֎ ${text}`, Foreground.green, 
+                                          Background.bgBlack, 
+                                          2, 
+                                          true, 
+                                          true, 
+                                          false, 
+                                          true);
+    }
+
     public static Instruct(text: string)
     {
         CurrentTerminal.Echo(`♣♣♣ ${text}`, Foreground.cyanBright, 
@@ -66,7 +77,6 @@ export class TerminalAgent
         const run:boolean = await CommonMenu.ShowContinueSkipAsync('>>>');
         if(run)
         {
-            TerminalAgent.Hint(hint);
             TerminalAgent.Exec(cmd);
         }
         else

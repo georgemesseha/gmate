@@ -41,7 +41,7 @@ export class Intellisense<TOption>
             {
                 type: 'autocomplete',
                 name: 'desc',
-                pageSize: 10,
+                pageSize: 20,
                 message: prompt,
                 source: (answersSoFar:string[], input:string) => 
                 {

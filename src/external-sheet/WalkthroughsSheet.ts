@@ -59,22 +59,26 @@ export class WalkthroughsSheet
     public CreatedOn: Date = new Date();
     public Walkthroughs: IWalkthrough[] = [];
     
-    public static Exists(): boolean
+    public get WalkthroughList(): List<IWalkthrough>
+    {
+        return new List<IWalkthrough>(this.Walkthroughs);
+    }
+
+    public static FileExists(): boolean
     {
         return PathMan.GotchaLocalRepo_WalkthroughsSheet.Exists()
     }
 
-    private static _singleton: WalkthroughsSheet;
+    private static _singleton: WalkthroughsSheet|null = null;
     
     public static get Singleton(): WalkthroughsSheet|null
     {
-        if(this.Exists() == false) return null;
+        if(this._singleton) return this._singleton;
 
-        if(!this._singleton)
-        {
-            this._singleton = Json.Load<WalkthroughsSheet>(PathMan.GotchaLocalRepo_WalkthroughsSheet.FullName);
-        }
-        
+        if(this.FileExists() == false) return null;
+
+        this._singleton = Json.Load<WalkthroughsSheet>(PathMan.GotchaLocalRepo_WalkthroughsSheet.FullName);
+         
         return this._singleton;
     }
 

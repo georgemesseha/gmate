@@ -6,17 +6,16 @@ import { CurrentTerminal } from "decova-terminal";
 import { Intellisense } from "../external-sheet/Intellisense";
 import { TerminalAgent } from "../external-sheet/TerminalAgent";
 import { ILocalTool } from "./LocalToolsDispatcher";
-
-import { DecovaSettings } from "./Techies/DecovaSpecific/DecovaSettings";
 import { PackageJson } from "./Techies/Package-General/PackageJson";
-import { PackMan } from "./Techies/PackMan";
+import { PackMan } from "./Techies/ArtifactMan/PackMan";
 import { PathMan } from "./Techies/PathMan";
+import { DecovaSettings } from "./Techies/ArtifactMan/DecovaSettings";
 
 export class LTool_IncrementPatch implements ILocalTool
 {
     GetHint(): string
     {
-        return `Will increment the patch part of your currently being edited package, and optionally update the dependent workspaces.`
+        return `Increments the patch part of your currently being edited package, and optionally update the dependent workspaces.`
     }
     GetShortcut(): string
     {
@@ -35,10 +34,10 @@ export class LTool_IncrementPatch implements ILocalTool
             return;
         }
 
-
         const pkg = new PackageJson(pkgFile.FullName);
 
         pkg.IncrementVersionPatch(true);
+        TerminalAgent.ShowSuccess(`Package version was updated to ${pkg.version}`)
 
         const qUpdateDependentWorkspaces = new Intellisense<string>(["Yes", "No"], op=>op);
         const ans = await qUpdateDependentWorkspaces.PromptAsync('Update as the minimum for dependent workspaces?');
@@ -46,10 +45,6 @@ export class LTool_IncrementPatch implements ILocalTool
         if(ans == "Yes")
         {
            const success: boolean = await this.UpdateDependentWorkspacesAsync(); 
-           if(success)
-           {
-               TerminalAgent.ShowSuccess('Dependents have been updated with the patch successfuly')
-           }
         }
     }
 
@@ -69,7 +64,6 @@ export class LTool_IncrementPatch implements ILocalTool
             TerminalAgent.ShowError(`Couldn't load package.json from current directory [${DirectoryInfo.Current.FullName}]`)
             return false;
         }
-
         try
         {
             packMan.UpdateLeastVersionOnDependents();

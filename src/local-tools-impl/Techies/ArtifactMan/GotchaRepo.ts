@@ -1,11 +1,11 @@
 import { Process } from "decova-environment";
-import { TerminalAgent } from "../external-sheet/TerminalAgent";
-import { ExternalResources } from "./ExternalResouces";
-import { PathMan } from "./Techies/PathMan";
+import { TerminalAgent } from "../../../external-sheet/TerminalAgent";
+import { ExternalResources } from "../../ExternalResouces";
+import { PathMan } from "../PathMan";
 
-export class Git
+export class GotchaRepo
 {
-    static async GotchaRepo_PullAsync()
+    static async PullAsync()
     {
         const entryWorkDir = Process.Current.CurrentWorkingDirectory;
         PathMan.GotchaLocalRepo.SetAsCurrentDirectory()
@@ -13,7 +13,7 @@ export class Git
         entryWorkDir.SetAsCurrentDirectory();
     }
 
-    static async GotchaRepo_CloneAsync()
+    static async CloneAsync()
     {
         const entryWorkDir = Process.Current.CurrentWorkingDirectory;
         PathMan.GotchaMainDir.SetAsCurrentDirectory()
@@ -21,7 +21,7 @@ export class Git
         entryWorkDir.SetAsCurrentDirectory();
     }
 
-    static async GotchaRepo_CommitAsync()
+    static async CommitAsync()
     {
         const entryWorkDir = Process.Current.CurrentWorkingDirectory;
         PathMan.GotchaLocalRepo.SetAsCurrentDirectory()
@@ -29,7 +29,7 @@ export class Git
         entryWorkDir.SetAsCurrentDirectory();
     }
 
-    static async GotchaRepo_PushAsync()
+    static async PushAsync()
     {
         const entryWorkDir = Process.Current.CurrentWorkingDirectory;
         PathMan.GotchaLocalRepo.SetAsCurrentDirectory()

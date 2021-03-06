@@ -4,7 +4,7 @@ import { Dictionary, Exception, List, XString } from "decova-dotnet-developer";
 import { Intellisense } from "./Intellisense";
 import { TerminalAgent } from "./TerminalAgent";
 import { LTool_CheckGotchaLocalRepo } from "../local-tools-impl/LTool_CheckGotchaLocalRepo";
-import { LocalToolsDispatcher } from "../local-tools-impl/LocalToolsDispatcher";
+import { ILocalTool, LocalToolsDispatcher } from "../local-tools-impl/LocalToolsDispatcher";
 import { CommonMenu } from "../local-tools-impl/Techies/CommonMenu";
 import { PathMan } from "../local-tools-impl/Techies/PathMan";
 require('dotenv')
@@ -88,7 +88,10 @@ export class ExecFromSheet
 
     public async HandleCommandAsync(command: IStep, vars: Dictionary<string, string>)
     {
-       TerminalAgent.Hint(command.DisplayText)
+        if(command.DisplayText)
+        {
+            TerminalAgent.Hint(command.DisplayText)
+        }
 
         const output = this.CompileScript(command.Composer, vars);
         if(!output)
@@ -107,12 +110,11 @@ export class ExecFromSheet
         {
             TerminalAgent.ShowError("Command skipped!")
         }
-        
     }
 
     private async HandleInstructionAsync(instruction: IStep, vars: Dictionary<string, string>)
     {
-        TerminalAgent.Hint(instruction.DisplayText)
+        // TerminalAgent.Hint(instruction.DisplayText)
 
         let output = await this.CompileScript(instruction.Composer, vars) 
         TerminalAgent.Instruct(output as string)
@@ -120,7 +122,7 @@ export class ExecFromSheet
         const ans = await CommonMenu.ShowContinueSkipAsync('>>>')
         if(ans)
         {
-            TerminalAgent.ShowError("Done!")
+            TerminalAgent.ShowSuccess("Done!")
         }
         else
         {
@@ -168,9 +170,30 @@ export class ExecFromSheet
         };
     }
 
+    private WalkthroughFromLocalTool(localTool: ILocalTool): IWalkthrough
+    {
+        return {
+            DisplayText: `Gotcha >> Local Tool >> {g ${localTool.GetShortcut()}} ${localTool.GetHint()}`,
+            IsActive: true,
+            Shortcut: localTool.GetShortcut(),
+            Steps: [
+                {
+                    Composer: `g ${localTool.GetShortcut()}`,
+                    DisplayText: ">>>",
+                    IsActive: true,
+                    Type: StepType.Command,
+                    RunOnlyIf: "",
+                    Options: [],
+                    Regex: "",
+                    VarName: ""
+                }
+            ]
+        }
+    }
+
     public async TakeControlAsync(specificCmd: string|null)
     {
-        while(WalkthroughsSheet.Exists() == false)
+        while(WalkthroughsSheet.FileExists() == false)
         {
             TerminalAgent.ShowError(`Walkthroughs sheet doesn't exist in the local repo!`)
             await LocalToolsDispatcher.RunAsync(new LTool_CheckGotchaLocalRepo())
@@ -180,7 +203,7 @@ export class ExecFromSheet
         if(specificCmd)
         {
             specificCmd = specificCmd.toLowerCase().trim();
-            const wlk = new List<IWalkthrough>(WalkthroughsSheet.Singleton!.Walkthroughs)
+            const wlk = WalkthroughsSheet.Singleton!.WalkthroughList
                             .Where(w => w.Shortcut?.trim().toLowerCase() == specificCmd)
                             .FirstOrDefault(()=>true)
             if(wlk)
@@ -194,7 +217,11 @@ export class ExecFromSheet
         }
         else
         {
-            const allWks = new List<IWalkthrough>(WalkthroughsSheet.Singleton!.Walkthroughs);
+            // let allWks = WalkthroughsSheet.Singleton!.WalkthroughList;
+            let allWks = new List<IWalkthrough>(WalkthroughsSheet.Singleton!.Walkthroughs);
+            const localToolsAsWalkthroughs = LocalToolsDispatcher.Singleton.RegisteredTools.Select(this.WalkthroughFromLocalTool);
+            allWks.AddRange(localToolsAsWalkthroughs);
+            allWks = allWks.Sort(w=>w.DisplayText);
 
             const intelli = new Intellisense<IWalkthrough>(allWks, (op) => op.DisplayText)
             let ans = await intelli.PromptAsync('>>>')

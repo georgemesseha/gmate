@@ -12,7 +12,8 @@ import { KeyValuePair, XString } from "decova-dotnet-developer";
 import { LTool_IncrementPatch } from "./local-tools-impl/LTool_IncrementPatch";
 import { DirectoryInfo } from "decova-filesystem";
 import { LTool_CheckGotchaLocalRepo } from "./local-tools-impl/LTool_CheckGotchaLocalRepo";
-import { LTool_EditWalkthroughs } from "./local-tools-impl/LTool_EditWalkthroughs";
+import { LTool_EditWalkthroughs, LTool_EditSnippets, LTool_EditLaunchFile } from "./local-tools-impl/LTool_EditAugmenterFile";
+
 
 
 
@@ -36,15 +37,16 @@ export class App
         console.log('........................................');
     }
 
-    private _localToolsDispatcher = new LocalToolsDispatcher();
-
+   
     private RegisterLocalTools(): void
     {
-        this._localToolsDispatcher.RegisterLocalTools
+        LocalToolsDispatcher.Singleton.RegisterLocalTools
         (         
             new LTool_IncrementPatch(),
             new LTool_CheckGotchaLocalRepo(),
             new LTool_EditWalkthroughs(),
+            new LTool_EditSnippets(),
+            new LTool_EditLaunchFile(),
         )
     }
 
@@ -55,7 +57,7 @@ export class App
         {
             // #region try local tool first
             const nextArgs = XString.Join('', Process.Current.Args.Skip(1).Items);
-            const isLocalTool = await this._localToolsDispatcher.TryAimTool(arg0, nextArgs.Value);
+            const isLocalTool = await LocalToolsDispatcher.Singleton.TryAimTool(arg0, nextArgs.Value);
             // #endregion
 
             // #region if it's not a local tool, consult sheet
@@ -82,7 +84,6 @@ export class App
         await this.DispatchAsync();
     }
 }
-
 
 
 new App().StartAsync();

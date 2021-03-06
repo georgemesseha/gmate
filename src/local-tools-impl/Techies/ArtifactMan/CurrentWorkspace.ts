@@ -1,7 +1,7 @@
 import { Process } from "decova-environment";
 import { DirectoryInfo, FileInfo } from "decova-filesystem";
 import path from "path";
-import { PathMan } from "./PathMan";
+import { PathMan } from "../PathMan";
 
 
 

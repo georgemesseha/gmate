@@ -4,10 +4,10 @@ import { Json } from "decova-json";
 import { Process, Environment } from 'decova-environment'
 import path from 'path';
 import { CurrentTerminal } from "decova-terminal";
-import { PackageJson } from "./Package-General/PackageJson";
-import { DecovaSettings } from "./DecovaSpecific/DecovaSettings";
-import { PathMan } from "./PathMan";
-import { TerminalAgent } from "../../external-sheet/TerminalAgent";
+import { PackageJson } from "../Package-General/PackageJson";
+import { DecovaSettings } from "./DecovaSettings";
+import { PathMan } from "../PathMan";
+import { TerminalAgent } from "../../../external-sheet/TerminalAgent";
 
 
 export class PackMan
@@ -31,8 +31,6 @@ export class PackMan
             throw new Exception(`Couldn't load configuration file`, error as Exception);
         }
     }
-
-
 
     public GetProjectsContainerDirs(): List<DirectoryInfo>
     {

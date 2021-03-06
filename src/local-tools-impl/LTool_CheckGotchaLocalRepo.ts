@@ -3,7 +3,7 @@ import { Path } from "decova-filesystem";
 import { Intellisense } from "../external-sheet/Intellisense";
 import { TerminalAgent } from "../external-sheet/TerminalAgent";
 import { ExternalResources } from "./ExternalResouces";
-import { Git } from "./Git";
+import { GotchaRepo } from "./Techies/ArtifactMan/GotchaRepo";
 import { ILocalTool } from "./LocalToolsDispatcher";
 
 import { PathMan } from "./Techies/PathMan";
@@ -23,7 +23,7 @@ export class LTool_CheckGotchaLocalRepo implements ILocalTool
     {
         if(PathMan.GotchaLocalRepo.Exists() == false || PathMan.GotchaLocalRepo.GetFiles().Count == 0)
         {
-            await Git.GotchaRepo_CloneAsync();        
+            await GotchaRepo.CloneAsync();        
         }
         else
         {
@@ -32,7 +32,7 @@ export class LTool_CheckGotchaLocalRepo implements ILocalTool
             const ans = await intelli.PromptAsync('>>>');
             if (ans == 'Yes')
             {
-               await Git.GotchaRepo_PullAsync();
+               await GotchaRepo.PullAsync();
             }
         }
         return Promise.resolve();

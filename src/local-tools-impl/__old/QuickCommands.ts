@@ -2,7 +2,7 @@ import { List } from "decova-dotnet-developer";
 import { Json } from "decova-json";
 import { Process } from "decova-environment";
 import { DirectoryInfo } from "decova-filesystem";
-import { PackMan } from "../Techies/PackMan";
+import { PackMan } from "../Techies/ArtifactMan/PackMan";
 import { PackageJson } from "../Techies/Package-General/PackageJson";
 import path from 'path'
 import { CurrentTerminal, CurrentTerminal as trm } from "decova-terminal";

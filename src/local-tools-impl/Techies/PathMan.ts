@@ -63,6 +63,19 @@ export class PathMan
         return new FileInfo(path);
     }
 
+    static get GotchaLocalRepo_LaunchFile(): FileInfo
+    {
+        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.launch);
+        return new FileInfo(path);
+    }
+
+    static get GotchaLocalRepo_SettingsFile(): FileInfo
+    {
+        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.settings);
+        return new FileInfo(path);
+    }
+
+
     static get CurrentWorkspace(): DirectoryInfo
     {
         return DirectoryInfo.Current;

@@ -1,5 +1,6 @@
-import { Dictionary, Exception } from "decova-dotnet-developer";
+import { Dictionary, Exception, List } from "decova-dotnet-developer";
 import { TerminalAgent } from "../external-sheet/TerminalAgent";
+import { LTool_EditSnippets } from "./LTool_EditAugmenterFile";
 import { LTool_IncrementPatch } from "./LTool_IncrementPatch";
 import { CommonMenu } from "./Techies/CommonMenu";
 
@@ -15,6 +16,22 @@ export interface ILocalTool
 
 export class LocalToolsDispatcher
 {
+    private static _singleton: LocalToolsDispatcher;
+    public static get Singleton(): LocalToolsDispatcher
+    {
+        if(this._singleton == null)
+        {
+            this._singleton = new LocalToolsDispatcher()
+        }
+        return this._singleton;
+    }
+
+    constructor()
+    {
+        if(LocalToolsDispatcher._singleton) throw new Exception('Only one instance of LocalToolsDispatcher is expected to be initialzed on the app lifetime')
+        LocalToolsDispatcher._singleton = this;
+    }
+
     private _local_tools_dictionary: Dictionary<string, ILocalTool> = 
     new Dictionary<string, ILocalTool>();
 
@@ -48,7 +65,6 @@ export class LocalToolsDispatcher
         else
         {
             const tool = this._local_tools_dictionary.Get(shortcut);
-            TerminalAgent.Hint(tool!.GetHint());
             await tool!.TakeControlAsync(args);
             return true;
         }
@@ -71,5 +87,8 @@ export class LocalToolsDispatcher
         }
     }
 
-
+    public get RegisteredTools(): List<ILocalTool>
+    {
+        return this._local_tools_dictionary.Values;
+    }
 }

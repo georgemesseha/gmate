@@ -1,6 +1,6 @@
 {
 	"name": "decova-gotcha",
-	"version": "0.1.91",
+	"version": "0.1.107",
 	"liscense": "",
 	"main": "index.js",
 	"module": "",
@@ -46,9 +46,8 @@
 		"require": "^2.4.20"
 	},
 	"bin": {
-		"pk": "./index.js",
-		"ggg": "./index.js",
-		"k": "./index.js"
+		"g": "./index.js",
+		"ggg": "./index.js"
 	},
 	"devDependencies": {
 		"@types/figlet": "^1.2.0",

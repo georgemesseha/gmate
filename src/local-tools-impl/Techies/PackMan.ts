@@ -7,7 +7,7 @@ import { CurrentTerminal } from "decova-terminal";
 import { PackageJson } from "./Package-General/PackageJson";
 import { DecovaSettings } from "./DecovaSpecific/DecovaSettings";
 import { PathMan } from "./PathMan";
-import { TerminalAgent } from "src/external-sheet/TerminalAgent";
+import { TerminalAgent } from "../../external-sheet/TerminalAgent";
 
 
 export class PackMan

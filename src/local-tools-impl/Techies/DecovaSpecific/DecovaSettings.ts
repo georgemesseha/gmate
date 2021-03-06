@@ -1,7 +1,7 @@
 import { Environment } from "decova-environment";
 import { DirectoryInfo, FileInfo, Path } from "decova-filesystem";
 import { Json } from "decova-json";
-import { TerminalAgent } from "src/external-sheet/TerminalAgent";
+import { TerminalAgent } from "../../../external-sheet/TerminalAgent";
 
 import { PackageJson } from "../Package-General/PackageJson";
 import { PathMan } from "../PathMan";

@@ -1,6 +1,6 @@
 import { DirectoryInfo, FileInfo } from "decova-filesystem";
 import path from 'path'
-import { CommonFileName } from "./PackMan";
+
 
 
 export class WorkspaceAugmenter
@@ -72,11 +72,11 @@ export class WorkspaceAugmenter
         
     }
 
-    public static EnsureWorkspaceAugmented()
-    {
-        this.EnsureWholeFileContentPublished(CommonFileName.decovaSettings, 
-                                             CommonFileName.decovaSnippets);
+    // public static EnsureWorkspaceAugmented()
+    // {
+    //     this.EnsureWholeFileContentPublished(CommonFileName.decovaSettings, 
+    //                                          CommonFileName.decovaSnippets);
 
-        this.EnsureTasksPublished();
-    }
+    //     this.EnsureTasksPublished();
+    // }
 }

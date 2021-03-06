@@ -1,7 +1,8 @@
 import { Process } from "decova-environment";
 import { DirectoryInfo, FileInfo } from "decova-filesystem";
 import path from "path";
-import { CommonDirName, CommonFileName } from "./PackMan";
+import { PathMan } from "./PathMan";
+
 
 
 export class CurrentWorkspace
@@ -16,8 +17,7 @@ export class CurrentWorkspace
         else
         {
             return currentDir.FindAncestor(a=>a.GetFiles().Any(f=>f.Name == 'package.json'));
-        }
-       
+        } 
     }
 
     public get VsCodeDir(): DirectoryInfo|null
@@ -27,21 +27,21 @@ export class CurrentWorkspace
 
     public get TasksFile(): FileInfo
     {
-        return new FileInfo(path.join(this.VsCodeDir!.FullName, CommonFileName.tasksJson));
+        return PathMan.CurrentWorkspace_Tasks
     }
 
     public get SettingsFile(): FileInfo
     {
-        return new FileInfo(path.join(this.VsCodeDir!.FullName, CommonFileName.settings));
+        return PathMan.CurrentWorkspace_Settings
     }
 
     public get DecovaSettingsFile(): FileInfo
     {
-        return new FileInfo(path.join(this.VsCodeDir!.FullName, CommonFileName.decovaSettings));
+        return PathMan.GotchaLocalRepo_DecovaSettingsFile
     }
 
     public get LaunchFile(): FileInfo
     {
-        return new FileInfo(path.join(this.VsCodeDir!.FullName, CommonFileName.launch));
+        return PathMan.CurrentWorkspace_Lanuch;
     }
 }

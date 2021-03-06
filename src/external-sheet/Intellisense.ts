@@ -9,13 +9,17 @@ export class Intellisense<TOption>
 {
     private _plainOptions: string[] = [];
 
-    constructor(private _options: List<TOption>, 
+    constructor(private _options: List<TOption>|TOption[], 
                 private _displaySelector:DlgTextRepresenter<TOption>)
     {
-        this._plainOptions = _options.Select(op => this._displaySelector(op)).Items;
+        if(this._options.constructor != List)
+        {
+            this._options = new List<TOption>(this._options as TOption[]);
+        }
+        this._plainOptions = this._options.Select(op => this._displaySelector(op)).Where(display => !!display).Items;
     }
 
-    private FilterOptions(options:string[], searchString: string)
+    private FilterOptions(options:string[], searchString: string): string[]
     {
         if(new XString(searchString).IsNullOrWhiteSpace()) return options;
         const keys = new List<string>(searchString.split(" ")).Select(s => s.trim().toLowerCase())
@@ -23,37 +27,36 @@ export class Intellisense<TOption>
         return output;
     }
 
-   
-
-    public async PromptPlain(): Promise<string>
+    private async PromptPlainAsync(prompt: string): Promise<string>
     {
         inquirer.registerPrompt
         (
             'autocomplete',
             require('inquirer-autocomplete-prompt')
         );
+        
         const answer = await inquirer
         .prompt
         ([
             {
                 type: 'autocomplete',
-                name: 'Description',
+                name: 'desc',
                 pageSize: 10,
-                message: '>>>',
+                message: prompt,
                 source: (answersSoFar:string[], input:string) => 
                 {
-                    return this.FilterOptions(this._plainOptions, input)
+                    return this.FilterOptions(this._plainOptions, input)//.map(i=>({desc: i}))
                 }
             }
         ]);
 
-        return answer['Description'];
+        return answer['desc'];
     }
 
 
-    public async Prompt(): Promise<TOption>
+    public async PromptAsync(prompt: string): Promise<TOption>
     {
-        const selectedPlain = await(this.PromptPlain())
-        return this._options.First(op => this._displaySelector(op) == selectedPlain)
+        const selectedPlain = await(this.PromptPlainAsync(prompt))
+        return (this._options as List<TOption>).First(op => this._displaySelector(op) == selectedPlain)
     }
 }

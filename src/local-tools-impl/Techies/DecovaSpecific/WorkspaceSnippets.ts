@@ -1,9 +1,9 @@
 import { List } from "decova-dotnet-developer";
-import { CommonDirName, CommonFileName } from "./PackMan";
 import { Json } from "decova-json";
 import { Process, Environment } from "decova-environment";
 import path from 'path';
-import { PoykaConstants } from "./PoykaConstants";
+import { PoykaConstants } from "../../__old/PoykaConstants";
+import { PathMan } from "../PathMan";
 
 export class CodeSnippet
 {
@@ -23,9 +23,7 @@ export class WorkspaceSnippets
   // #region loading
     private static LoadOfCurrentWorkspace(): WorkspaceSnippets
     {
-        return this.Load(path.join(Process.Current.CurrentWorkingDirectory.FullName, 
-                                    CommonDirName.vscode, 
-                                    CommonFileName.decovaSnippets));
+        return this.Load(PathMan.CurrentWorkspace_DecovaSnippets.FullName);
     }
 
     private static LoadOfPoyka(): WorkspaceSnippets
@@ -66,9 +64,7 @@ export class WorkspaceSnippets
         function updateCurrentWorkspace()
         {
             missingSnippetsInWorkspace.Foreach(p=>ofWorkspace[p] = ofWorkspace[p]);
-            const targetPath = path.join(Process.Current.CurrentWorkingDirectory.FullName, 
-                                         CommonDirName.vscode, 
-                                         CommonFileName.decovaSettings);
+            const targetPath = PathMan.CurrentWorkspace_DecovaSettings.FullName;
             Json.TrySave(targetPath, ofWorkspace, true);
             console.log(`The following snippets are synced to current workspace:`, missingSnippetsInPoyka.Items);
         }

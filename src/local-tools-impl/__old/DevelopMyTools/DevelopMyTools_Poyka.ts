@@ -2,7 +2,8 @@
 //import ch from 'chalk';
 import {CurrentTerminal as Terminal} from "decova-terminal";
 import path from 'path'
-import { CommonFileName } from "../PackMan";
+import { PathMan } from "../../../local-tools-impl/Techies/PathMan";
+
 
 export class DevelopMyTools_Poyka
 {
@@ -19,7 +20,7 @@ export class DevelopMyTools_Poyka
         Terminal.Exec(`cd "${this._projectDir}"`);
         await Terminal.HintBeforeLaunchAsync('Press ENTER to take you to Poyka/snippets');
         Terminal.Exec(`code ${this._projectDir}`);
-        Terminal.Exec(`code ` + path.join(this._projectDir, `contents`, CommonFileName.decovaSnippets));
+        Terminal.Exec(`code ` + PathMan.CurrentWorkspace_DecovaSnippets.FullName);
         await Terminal.InstructAsync(`Make your edits!`, `$$$Press ENTER when done!`);
         await Terminal.ConfirmAsync(`Ready for publishing Poyka?`);
         Terminal.Exec('ggg "++"');

@@ -41,6 +41,6 @@
   "include": [ 
     "./src/**/*.tsx",
     "./src/**/*.ts", 
-    "src/app.ts",
+    "src/App.ts",
   ]
 }

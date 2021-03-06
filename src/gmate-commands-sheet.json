@@ -5,7 +5,8 @@
     "Walkthroughs": [
         {
             "IsActive": true,
-            "DisplayText": "Find the process using a specific port",
+            "DisplayText": "Ops >> Find the process whose port",
+            "Shortcut": "find-process-whose-port",
             "Steps": [
                 {
                     "IsActive": true,
@@ -13,8 +14,9 @@
                     "Type": "Prompt",
                     "VarName": "port",
                     "DisplayText": "Port #",
+                    "Regex": "^[0-9]{2,}$",
                     "Options": [],
-                    "Composer": "()=> 'netstat -ano | findstr :<<port>>'"
+                    "Composer": "function(){ return 'netstat -ano | findstr :<port>' }"
                 },
                 {
                     "IsActive": true,
@@ -23,13 +25,13 @@
                     "VarName": "",
                     "DisplayText": "Will find the ID of the process using a specific port.",
                     "Options": [],
-                    "Composer": "()=> `netstat -ano | findstr :<<port>>`"
+                    "Composer": "()=> `netstat -ano | findstr :<port>`"
                 }
             ]
         },
         {
             "IsActive": true,
-            "DisplayText": "vscode >> install & build & patch++ & publish #increment#push)",
+            "DisplayText": "vscode >> install & build & patch++ & publish #increment#push",
             "Steps": [
                 {
                     "IsActive": true,
@@ -163,6 +165,7 @@
         },
         {
             "IsActive": true,
+            "DisplayText": "Will guide you through the old Poyka navigation.",
             "Type": "Command",
             "Steps": [
                 {

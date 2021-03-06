@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-require('./dist/app.js');
+process.env.RootDir = __dirname;
+require('dotenv').config('/.env')
+require('./dist/App.js');

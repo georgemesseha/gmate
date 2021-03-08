@@ -43,8 +43,6 @@ export class ExecFromSheet
         vars.Ensure(prompt.VarName, ans)
     }
 
-
-
     private CompileScript(composer: string, vars: Dictionary<string, string>): string|null
     {
         let output = new XString(composer.trim());
@@ -90,10 +88,12 @@ export class ExecFromSheet
     {
         if(command.DisplayText)
         {
-            TerminalAgent.Hint(command.DisplayText)
+            const displayText = this.CompileScript(command.DisplayText, vars)
+            TerminalAgent.Hint(displayText!)
         }
 
         const output = this.CompileScript(command.Composer, vars);
+        
         if(!output)
         {
             TerminalAgent.ShowError('Command terminated');
@@ -114,9 +114,9 @@ export class ExecFromSheet
 
     private async HandleInstructionAsync(instruction: IStep, vars: Dictionary<string, string>)
     {
-        // TerminalAgent.Hint(instruction.DisplayText)
+        const composer: string = instruction.Composer ?? instruction.DisplayText;
 
-        let output = await this.CompileScript(instruction.Composer, vars) 
+        let output = await this.CompileScript(composer, vars) 
         TerminalAgent.Instruct(output as string)
         
         const ans = await CommonMenu.ShowContinueSkipAsync('>>>')

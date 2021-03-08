@@ -24,7 +24,7 @@ export abstract class LTool_AbstractEditAugmenterFile implements ILocalTool
         {
             await GotchaRepo.CommitAsync();
             await GotchaRepo.PushAsync();
-            await GotchaRepo.PullAsync();
+            // await GotchaRepo.PullAsync();
         }
 
     }

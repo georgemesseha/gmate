@@ -5,30 +5,16 @@ import { IPrompt } from "./IPrompt";
 import { IInstruction } from "./IInstruction";
 import { IMcq } from "./IMcq";
 import { IRepeater } from "./IRepeater";
+import { IAggregator } from "./IAggregator";
 
 
-export class Step
+export interface IStep
 {
-    get Type(): StepType
-    {
-        console.log('****************** this.Command = ', this.Command)
-        if (this.Command)
-            return StepType.Command;
-        if (this.Prompt)
-            return StepType.Prompt;
-        if (this.Mcq)
-            return StepType.Mcq;
-        if (this.Repeater)
-            return StepType.Repeater;
-        if (this.Instruction)
-            return StepType.Instruction;
-        else
-            throw new Exception_UnintendedExecutionPath("");
-    }
     RunOnlyIfComposer: string|undefined;
     Command: ICommand|undefined;
     Prompt: IPrompt|undefined;
     Instruction: IInstruction|undefined;
     Repeater: IRepeater|undefined;
+    Aggregator: IAggregator|undefined;
     Mcq: IMcq|undefined;
 }

@@ -1,8 +1,8 @@
-import { Step } from "./Step";
+import { IStep } from "./Step";
 
 
 export interface IRepeater
 {
-    IterationSteps: Step[];
+    IterationSteps: IStep[];
     DoRepeatQuestionComposer: string;
 }

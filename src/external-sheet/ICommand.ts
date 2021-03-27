@@ -5,3 +5,4 @@ export interface ICommand
     CommandComposer: string;
     SkipPrompt: boolean;
 }
+

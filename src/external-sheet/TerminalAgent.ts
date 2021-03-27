@@ -6,13 +6,13 @@ export class TerminalAgent
 {
     public static ShowSuccess(text: string)
     {
-        CurrentTerminal.Echo(` ¤¤¤ ${text}`, Foreground.green, 
-                                          Background.bgBlack, 
+        CurrentTerminal.Echo(`   ${text}  `, Foreground.black, 
+                                          Background.bgGreen, 
                                           2, 
                                           true, 
                                           true, 
                                           false, 
-                                          true);
+                                          false);
     }
 
     public static Instruct(text: string)

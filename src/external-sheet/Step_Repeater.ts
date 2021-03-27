@@ -1,10 +1,10 @@
-import { Step } from "./Step";
+import { IStep } from "./Step";
 
 
 
 export class Step_Repeater
 {
-    IterationSteps: Step[];
+    IterationSteps: IStep[];
     DoRepeatQuestionComposer: string;
-    AggregatorStep: Step;
+    AggregatorStep: IStep;
 }

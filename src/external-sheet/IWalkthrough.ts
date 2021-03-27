@@ -1,4 +1,4 @@
-import { Step } from "./Step";
+import { IStep } from "./Step";
 
 
 
@@ -6,5 +6,5 @@ export interface IWalkthrough
 {
     Title: string
     IsCommentedOut: boolean;
-    Steps: Step[];
+    Steps: IStep[];
 }

@@ -10,15 +10,18 @@ import { LTool_CheckGotchaLocalRepo } from "../local-tools-impl/LTool_CheckGotch
 import { ILocalTool, LocalToolsDispatcher } from "../local-tools-impl/LocalToolsDispatcher";
 import { CommonMenu } from "../local-tools-impl/Techies/CommonMenu";
 import { PathMan } from "../local-tools-impl/Techies/PathMan";
-import { Step } from "./Step";
+import { IStep } from "./Step";
 import { IPrompt } from "./IPrompt";
 import { IMcq } from "./IMcq";
 import { ICommand } from "./ICommand";
 import { IInstruction } from "./IInstruction";
+import { IRepeater } from "./IRepeater";
+import { IAggregator } from "./IAggregator";
 require('dotenv')
 
 export class ExecFromSheet
 {
+
     private async HandlePromptTextAsync(prompt: IPrompt, vars: Dictionary<string, string>)
     {
         const varName = this.CompileScript(prompt.VarNameComposer, vars) as string
@@ -29,6 +32,7 @@ export class ExecFromSheet
             const ans = await TerminalAgent.AskForTextAsync(quest)
             const hasPattern = new XString(prompt.Regex).IsNullOrWhiteSpace() == false;
 
+            // TerminalAgent.ShowError(`prompt.Regex = ${prompt.Regex}`)
             if (hasPattern)
             {
                 const regex = new RegExp(prompt.Regex);
@@ -39,7 +43,7 @@ export class ExecFromSheet
                 }
             }
 
-            vars.Ensure(varName, ans);
+            vars.Ensure(varName, ans, true);
 
         }
         while (vars.Contains(varName) == false)
@@ -58,7 +62,7 @@ export class ExecFromSheet
         TerminalAgent.ShowQuestion(question)
         const ans = await intelli.PromptAsync('>>>')
 
-        vars.Ensure(varName, ans.label)
+        vars.Ensure(varName, ans.label, true)
     }
 
     private CompileScript(composer: string, vars: Dictionary<string, string>): any
@@ -91,13 +95,46 @@ export class ExecFromSheet
         catch (err)
         {
             TerminalAgent.ShowError(`Error evaluating expression: ${output.Value}`)
-            return null;
+            throw `Error evaluating expression: ${output.Value}`;
+        }
+    }
+
+    private _currentAggregation: string[] | null = null;
+
+    private async HandleAggregatorAsync(aggregator: IAggregator, vars: Dictionary<string, string>)
+    {
+        this._currentAggregation = [];
+        for (let step of aggregator.Steps)
+        {
+            await this.HandleStep(step, vars)
+        }
+
+        const finalCommand = this._currentAggregation.join('')
+        vars.Add(aggregator.OutputVarName, finalCommand)
+
+        this._currentAggregation = null;
+    }
+
+    private async HandleRepeaterAsync(repeater: IRepeater, vars: Dictionary<string, string>)
+    {
+        while (true)
+        {
+            const promptContinue = new Intellisense<string>(["Yes", "No"], op => op)
+            if (await promptContinue.PromptAsync(repeater.DoRepeatQuestionComposer) == 'No')
+            {
+                break;
+            }
+
+            for (let step of repeater.IterationSteps)
+            {
+                await this.HandleStep(step, vars);
+            } 
         }
     }
 
     public async HandleCommandAsync(command: ICommand, vars: Dictionary<string, string>)
     {
-        if (command.WillDoHintComposer)
+        if (this._currentAggregation == null && command.WillDoHintComposer)
         {
             const hint = this.CompileScript(command.WillDoHintComposer, vars)
             TerminalAgent.Hint(hint!)
@@ -105,18 +142,21 @@ export class ExecFromSheet
 
         const output = this.CompileScript(command.CommandComposer, vars);
 
-        if (!output)
-        {
-            TerminalAgent.ShowError('Command terminated');
-            return;
-        }
-
         TerminalAgent.ShowSuccess(output)
 
-        if (command.SkipPrompt)
+        // #region if inside an Aggregator just accumulate, don't execute
+        if (this._currentAggregation != null)
+        {
+            this._currentAggregation.push(output as string);
+        }
+        // #endregion
+
+        // #region else
+        else if (command.SkipPrompt)
         {
             TerminalAgent.Exec(output as string)
         }
+        // #region if prompt is needed
         else
         {
             const ans = await CommonMenu.ShowContinueSkipAsync('>>>')
@@ -129,6 +169,8 @@ export class ExecFromSheet
                 TerminalAgent.ShowError("Command skipped!")
             }
         }
+        // #endregion
+        // #endregion
     }
 
     private async HandleInstructionAsync(instruction: IInstruction, vars: Dictionary<string, string>)
@@ -147,39 +189,52 @@ export class ExecFromSheet
         }
     }
 
+    private async HandleStep(step: IStep, vars: Dictionary<string, string>)
+    {
+        if (step.RunOnlyIfComposer)
+        {
+            const condition = this.CompileScript(step.RunOnlyIfComposer, vars);
+            if (!condition)
+            {
+                return;
+            }
+        }
+
+        if (step.Command)
+        {
+            await this.HandleCommandAsync(step.Command!, vars)
+        }
+        else if (step.Instruction)
+        {
+            await this.HandleInstructionAsync(step.Instruction!, vars)
+        }
+        else if (step.Mcq)
+        {
+            await this.HandleMcqAsync(step.Mcq!, vars)
+        }
+        else if (step.Prompt)
+        {
+            await this.HandlePromptTextAsync(step.Prompt!, vars)
+        }
+        else if (step.Repeater)
+        {
+            await this.HandleRepeaterAsync(step.Repeater, vars)
+        }
+        else if (step.Aggregator)
+        {
+            await this.HandleAggregatorAsync(step.Aggregator, vars)
+        }
+    }
+
     private async HanldeWalkthrough(wk: IWalkthrough)
     {
         if (wk.IsCommentedOut) return;
-        
+
         const vars = new Dictionary<string, string>();
 
         for (let step of wk.Steps) 
         {
-            if (step.RunOnlyIfComposer)
-            {
-                const condition = this.CompileScript(step.RunOnlyIfComposer, vars);
-                if (!condition)
-                {
-                    continue;
-                }
-            }
-            
-            if(step.Command)
-            {
-                await this.HandleCommandAsync(step.Command!, vars)
-            }
-            else if(step.Instruction)
-            {
-                await this.HandleInstructionAsync(step.Instruction!, vars)
-            }
-            else if(step.Mcq)
-            {
-                await this.HandleMcqAsync(step.Mcq!, vars)
-            }
-            else if(step.Prompt)
-            {
-                await this.HandlePromptTextAsync(step.Prompt!, vars)
-            }
+            await this.HandleStep(step, vars);
         };
     }
 
@@ -200,7 +255,7 @@ export class ExecFromSheet
                     Prompt: undefined,
                     Repeater: undefined,
                     RunOnlyIfComposer: undefined,
-                    Type: StepType.Command,
+                    Aggregator: undefined
                 }
             ]
         }
@@ -221,7 +276,7 @@ export class ExecFromSheet
         try
         {
             allWks.AddRange(localToolsAsWalkthroughs);
-        } 
+        }
         catch (err)
         {
             console.log(err)

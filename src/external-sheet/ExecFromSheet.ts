@@ -97,8 +97,6 @@ export class ExecFromSheet
 
     public async HandleCommandAsync(command: ICommand, vars: Dictionary<string, string>)
     {
-        console.log('**************************', JSON.stringify(command))
-
         if (command.WillDoHintComposer)
         {
             const hint = this.CompileScript(command.WillDoHintComposer, vars)

@@ -37,17 +37,17 @@ export class App
         console.log('........................................');
     }
 
-   
+
     private RegisterLocalTools(): void
     {
         LocalToolsDispatcher.Singleton.RegisterLocalTools
-        (         
-            new LTool_IncrementPatch(),
-            new LTool_CheckGotchaLocalRepo(),
-            new LTool_EditWalkthroughs(),
-            new LTool_EditSnippets(),
-            new LTool_EditLaunchFile(),
-        )
+            (
+                new LTool_IncrementPatch(),
+                new LTool_CheckGotchaLocalRepo(),
+                new LTool_EditWalkthroughs(),
+                new LTool_EditSnippets(),
+                new LTool_EditLaunchFile(),
+            )
     }
 
     private async DispatchAsync()
@@ -69,24 +69,29 @@ export class App
         }
         else
         {
-           // #region consult sheet
+            // #region consult sheet
             new ExecFromSheet().TakeControlAsync(Process.Current.Args.FirstOrDefault())
-           // #endregion
+            // #endregion
         }
     }
 
     public async StartAsync()
     {
         this.ShowStartupInfo();
-        // WorkspaceAugmenter.EnsureWorkspaceAugmented();
-
         this.RegisterLocalTools();
         await this.DispatchAsync();
     }
 }
 
 
-new App().StartAsync();
+try
+{
+    new App().StartAsync();
+} 
+catch (err)
+{
+    console.log(err)
+}
 
 
 

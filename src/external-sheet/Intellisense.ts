@@ -16,7 +16,7 @@ export class Intellisense<TOption>
         {
             this._options = new List<TOption>(this._options as TOption[]);
         }
-        this._plainOptions = this._options.Select(op => this._displaySelector(op)).Where(display => !!display).Items;
+        this._plainOptions = this._options.Select(op => this._displaySelector(op as TOption)).Where(display => !!display).Items;
     }
 
     private FilterOptions(options:string[], searchString: string): string[]

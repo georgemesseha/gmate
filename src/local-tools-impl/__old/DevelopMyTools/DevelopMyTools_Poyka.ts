@@ -23,7 +23,7 @@ export class DevelopMyTools_Poyka
         Terminal.Exec(`code ` + PathMan.CurrentWorkspace_DecovaSnippets.FullName);
         await Terminal.InstructAsync(`Make your edits!`, `$$$Press ENTER when done!`);
         await Terminal.ConfirmAsync(`Ready for publishing Poyka?`);
-        Terminal.Exec('ggg "++"');
+        Terminal.Exec('g "++"');
         await Terminal.InstructAsync('Ctrl + Shift + B >> Build & Publish', `VOILA`);
     }
 

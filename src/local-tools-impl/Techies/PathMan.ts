@@ -39,6 +39,12 @@ export class PathMan
         return new DirectoryInfo(path);
     }
 
+    static get GotchaLocalRepoGitDir(): DirectoryInfo
+    {
+        const path = Path.Join(this.GotchaLocalRepo.FullName, ".git");
+        return new DirectoryInfo(path);
+    }
+
     static get GotchaLocalRepo_DecovaSnippets(): FileInfo
     {
         const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.decovaSnippets);

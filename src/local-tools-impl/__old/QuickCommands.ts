@@ -15,7 +15,7 @@ enum Command
 
 function log(command: Command)
 {
-    console.log(`>> ggg ${command}`);
+    console.log(`>> g ${command}`);
     
 }
 

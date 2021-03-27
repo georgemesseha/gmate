@@ -6,7 +6,7 @@ export class TerminalAgent
 {
     public static ShowSuccess(text: string)
     {
-        CurrentTerminal.Echo(` ֎ ${text}`, Foreground.green, 
+        CurrentTerminal.Echo(` ¤¤¤ ${text}`, Foreground.green, 
                                           Background.bgBlack, 
                                           2, 
                                           true, 
@@ -68,7 +68,8 @@ export class TerminalAgent
 
     public static async AskForTextAsync(promptHint: string)
     {
-        return await CurrentTerminal.AskForTextAsync(promptHint)
+        this.ShowQuestion(promptHint);
+        return await CurrentTerminal.AskForTextAsync('>>>')
     }
 
     public static async AskToRunCommandAsync(hint: string, cmd: string)

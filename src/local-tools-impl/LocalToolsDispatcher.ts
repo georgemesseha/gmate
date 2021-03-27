@@ -77,7 +77,7 @@ export class LocalToolsDispatcher
         const ans = await CommonMenu.ShowContinueSkipAsync('>>>')
         if(ans)
         {
-            const cmd: string = `ggg ${lTool.GetShortcut()}`
+            const cmd: string = `g ${lTool.GetShortcut()}`
             console.log('command: ', cmd)
             TerminalAgent.Exec(cmd)
         }

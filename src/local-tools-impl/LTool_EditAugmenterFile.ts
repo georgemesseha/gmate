@@ -4,7 +4,7 @@ import { ILocalTool, LocalToolsDispatcher } from "./LocalToolsDispatcher";
 import { LTool_CheckGotchaLocalRepo } from "./LTool_CheckGotchaLocalRepo";
 import { CommonMenu } from "./Techies/CommonMenu";
 import { PathMan } from "./Techies/PathMan";
-
+import os from "os";
 export abstract class LTool_AbstractEditAugmenterFile implements ILocalTool
 {
     async TakeControlAsync(args: string): Promise<void>
@@ -12,11 +12,14 @@ export abstract class LTool_AbstractEditAugmenterFile implements ILocalTool
         const file = PathMan.GotchaLocalRepo_WalkthroughsSheet;
         while(file.Exists() == false)
         {
+            TerminalAgent.ShowError(`File [${file.FullName}] doesn't exist. I'll try to check out the repo.`)
             await LocalToolsDispatcher.RunAsync(new LTool_CheckGotchaLocalRepo())
         }
 
-        await TerminalAgent.AskToRunCommandAsync(this.GetHint(), 
-                                                 `code ${this.FilePath}`);
+        const cmd = os.platform() == "win32"? `code ${this.FilePath}`
+                                            : `sudo code --user-data-dir="~/.vscode-root" ${this.FilePath}`
+
+        await TerminalAgent.AskToRunCommandAsync(this.GetHint(), cmd);
 
         TerminalAgent.Hint(`Answer with 'Continue' when done with editing`)                                  
         let go = await CommonMenu.ShowContinueSkipAsync('>>>');

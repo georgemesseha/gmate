@@ -17,7 +17,9 @@ import path from "path";
 import { WorkspaceAugmenter as WorkspaceAugmenter } from "./local-tools-impl/Techies/DecovaSpecific/WorkspaceAugmenter";
 import { List } from "decova-dotnet-developer";
 import { Intellisense } from "./external-sheet/Intellisense";
-import { WalkthroughsSheet, ICmdSheet, InstructionType, IStep, IWalkthrough, StepType } from "./external-sheet/WalkthroughsSheet";
+import { StepType } from "./external-sheet/StepType";
+import { ICmdSheet } from "./external-sheet/ICmdSheet";
+import { IWalkthrough } from "./external-sheet/IWalkthrough";
 import os from "os";
 import { underline } from "chalk";
 

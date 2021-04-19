@@ -83,11 +83,28 @@
                         "$ref": "#/definitions/SCH_Step"
                     }
                 },
+                "WillDoHintComposer": {
+                    "type": "string"
+                },
+                "SkipPrompt": {
+                    "type": "boolean"
+                },
                 "DoRepeatQuestionComposer": {
                     "type": "string"
                 }
             },
-            "required": ["IterationSteps", "DoRepeatQuestionComposer"]
+            "required": ["DoRepeatQuestionComposer", "IterationSteps"]
+        },
+        "SCH_Aggregator": {
+            "properties": {
+                "Steps": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/SCH_Step" }
+                },
+                "OutputVarName": {
+                    "type": "string"
+                }
+            }
         },
         "SCH_Step": {
             "additionalProperties": false,
@@ -97,11 +114,24 @@
                     "type": "string",
                     "description": "A JS function that evaluates to boolean describes whether this step will run or not. Previous steps VarNames is typically used to author the function."
                 },
-                "Command": { "$ref": "#/definitions/SCH_Command" },
-                "Instruction": { "$ref": "#/definitions/SCH_Instruction" },
-                "Prompt": { "$ref": "#/definitions/SCH_Prompt" },
-                "Repeater": { "$ref": "#/definitions/SCH_Repeater" },
-                "Mcq": {"$ref": "#/definitions/SCH_Mcq"}
+                "Command": {
+                    "$ref": "#/definitions/SCH_Command"
+                },
+                "Instruction": {
+                    "$ref": "#/definitions/SCH_Instruction"
+                },
+                "Prompt": {
+                    "$ref": "#/definitions/SCH_Prompt"
+                },
+                "Repeater": {
+                    "$ref": "#/definitions/SCH_Repeater"
+                },
+                "Mcq": {
+                    "$ref": "#/definitions/SCH_Mcq"
+                },
+                "Aggregator": {
+                    "$ref": "#/definitions/SCH_Aggregator"
+                }
             },
             "oneOf": [
                 {
@@ -128,10 +158,14 @@
                     "required": [
                         "Mcq"
                     ]
+                },
+                {
+                    "required": [
+                        "Aggregator"
+                    ]
                 }
             ]
         },
-        
         "SCH_Walkthrough": {
             "additionalProperties": false,
             "properties": {
@@ -144,6 +178,9 @@
                     "items": {
                         "$ref": "#/definitions/SCH_Step"
                     }
+                },
+                "Shortcut": {
+                    "type": "string"
                 }
             },
             "required": [

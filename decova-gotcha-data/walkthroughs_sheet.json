@@ -37,28 +37,29 @@
     },
     "Ops >> vscode >> install & build & patch++ & publish #increment#push":
     {    
+      "Shortcut": "++",
       "Steps": [
         {
           "Command": {
-            "CommandComposer": "npm install",
-            "WillDoHintComposer": "`Will install the missing packages & update the outdated ones.`"
+            "CommandComposer": "`npm install`",
+            "WillDoHintComposer": "`Will install the missing packages & update the outdated ones.xxx`"
           }
         },
         {
           "Command": {
-            "CommandComposer": "tsc",
+            "CommandComposer": "`tsc`",
             "WillDoHintComposer": "`Will compile TypeScript`"
           }
         },
         {
           "Command": {
-            "CommandComposer": "g patch++",
+            "CommandComposer": "`g patch++`",
             "WillDoHintComposer": "`Will increment the version's path no. of the current workspace's package.json`"
           }
         },
         {
           "Command": {
-            "CommandComposer": "npm publish",
+            "CommandComposer": "`npm publish`",
             "WillDoHintComposer": "`Will publish the currently being developed package to npm repo.`"
           }
         }
@@ -69,19 +70,19 @@
       "Steps": [
         {
           "Command": {
-            "CommandComposer": "tsc",
+            "CommandComposer": "`tsc`",
             "WillDoHintComposer": "`Will compile TypeScript`"
           }
         },
         {
           "Command": {
-            "CommandComposer": "g patch++",
+            "CommandComposer": "`g patch++`",
             "WillDoHintComposer": "`Will increment the version's path no. of the current workspace's package.json`"
           }
         },
         {
           "Command": {
-            "CommandComposer": "vsce package",
+            "CommandComposer": "`vsce package`",
             "WillDoHintComposer": "`Will package the extension locally as vsix`"
           }
         }
@@ -104,7 +105,7 @@
         {
           "Command": {
             "WillDoHintComposer": "`Will list the globally installed packages.`",
-            "CommandComposer": "npm list --global --depth=0"
+            "CommandComposer": "`npm list --global --depth=0`"
           }
         }
       ]
@@ -114,8 +115,8 @@
       "Steps": [
         {
           "Command": {
-            "WillDoHintComposer": "Will list the running containers",
-            "CommandComposer": "docker ps"
+            "WillDoHintComposer": "`Will list the running containers`",
+            "CommandComposer": "`docker ps`"
           }
         }
       ]
@@ -125,7 +126,7 @@
       "Steps": [
         {
           "Mcq": {
-            "QuestionComposer": "List images to pick from?",
+            "QuestionComposer": "`List images to pick from?`",
             "OptionsComposer": "['Yes', 'No']",
             "VarNameComposer": "`listImages`"
           }
@@ -141,7 +142,8 @@
         {
           "Prompt": {
             "VarNameComposer": "`imageName`",
-            "QuestionComposer": "Image tag or ID?"
+            "QuestionComposer": "Image tag or ID?",
+            "Regex": "^\\S{2,}$"
           }
         },
         {
@@ -172,7 +174,7 @@
           "RunOnlyIfComposer": "()=> '<displayRunningContainers>' == 'Yes'",
 
           "Command": {
-            "WillDoHintComposer": "Will display the running containers",
+            "WillDoHintComposer": "`Will display the running containers`",
             "CommandComposer": "`docker ps`"
           }
         },
@@ -255,19 +257,132 @@
     {
       "Steps": [
         {
+          "Command": {
+            "CommandComposer": "`docker image ls`",
+            "WillDoHintComposer": "`Will list all local images to pick from`",
+            "SkipPrompt": true
+          }
+        },
+        {
           "Prompt": {
             "QuestionComposer": "`Image Tag or ID?`",
-            "VarNameComposer": "`imageName`"
+            "VarNameComposer": "`imageName`",
+            "Regex": "^\\S{2,}$"
           }
         },
         {
           "Prompt": {
             "QuestionComposer": "`Given contaienr tag?`",
-            "VarNameComposer": "`containerTag`"
+            "VarNameComposer": "`containerTag`",
+            "Regex": "^\\S{2,}$"
+          }
+        },
+        {
+          "Aggregator": {
+            "OutputVarName": "options",
+            "Steps": [
+              {
+                "Repeater": {
+                  "DoRepeatQuestionComposer": "Add port mapping?",
+                  "IterationSteps": [
+                    {
+                      "Prompt": {
+                        "VarNameComposer": "`portMapping`",
+                        "QuestionComposer": "`Port mapping`",
+                        "Regex": "^[0-9]+\\:[0-9]+$"
+                      }
+                    },
+                    {
+                      "Command": {
+                        "CommandComposer": "` -p <portMapping>`"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Mcq": {
+                  "QuestionComposer": "`Attach terminal?`",
+                  "OptionsComposer": "['1- Yes', '0- No']",
+                  "VarNameComposer": "`attached`"
+                }
+              },
+              {
+                "Command": {
+                  "CommandComposer": "()=>`<attached>` == '1- Yes'? ' -it' : ''"
+                }
+              },
+              {
+                "Mcq": {
+                  "QuestionComposer": "`Read only container?`",
+                  "OptionsComposer": "['1- Yes', '0- No']",
+                  "VarNameComposer": "`readonly`"
+                }
+              },
+              {
+                "Command": {
+                  "CommandComposer": "()=>`<readonly>` == '1- Yes'? ' --read-only' : ''"
+                }
+              },
+              {
+                "Mcq": {
+                  "QuestionComposer": "`Auto remove on exit?`",
+                  "OptionsComposer": "['1- Yes', '0- No']",
+                  "VarNameComposer": "`autoRemove`"
+                }
+              },
+              {
+                "Command": {
+                  "CommandComposer": "()=>`<autoRemove>` == '1- Yes'? ' --rm' : ''"
+                }
+              },
+              {
+                "Mcq": {
+                  "QuestionComposer": "`Restart Policy?`",
+                  "OptionsComposer": "['Always', 'Never', 'On failure', 'Unless Eplicitly Stopped']",
+                  "VarNameComposer": "`restartPolicy`"
+                }
+              },
+              {
+                "Command": {
+                  "CommandComposer": "()=>{ switch(`<restartPolicy>`) { case `Always`: return ` --restart always`; case `Never`: return ` --restart no`; case `On failure`: return ` --restart on-failure`; case `Unless Eplicitly Stopped`: return ` --restart unless-stopped`; }}"
+                }
+              },
+              {
+                "Mcq": {
+                  "QuestionComposer": "`Add volume?`",
+                  "OptionsComposer": "['1- Yes', '0- No']",
+                  "VarNameComposer": "`addVolume`"
+                }
+              },
+              {
+                "RunOnlyIfComposer": "()=>`<addVolume>` == `1- Yes`",
+                "Prompt": {
+                  "QuestionComposer": "`Host shared dir?`",
+                  "VarNameComposer": "`hostSharedDir`"
+                }
+              },
+              {
+                "RunOnlyIfComposer": "()=>`<addVolume>` == `1- Yes`",
+                "Prompt": {
+                  "QuestionComposer": "`Corresponding contaienr dir?`",
+                  "VarNameComposer": "`containerDir`"
+                }
+              },
+              {
+                "Command": {
+                  "CommandComposer": "` -v \"<hostSharedDir>\":\"<containerDir>\"`"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "Command": {
+            "CommandComposer": "`docker run <options> <imageName> `"
           }
         }
-
-
+        
       ]
     },
     "Ops >> Docker >> Container >> Display port mappings":
@@ -275,15 +390,16 @@
       "Steps": [
         {
           "Command": {
-            "CommandComposer": "docker ps",
-            "WillDoHintComposer": "Will list the running container",
+            "CommandComposer": "`docker ps`",
+            "WillDoHintComposer": "`Will list the running container`",
             "SkipPrompt": true
           }
         },
         {
           "Prompt": {
             "VarNameComposer": "`containerTag`",
-            "QuestionComposer": "`Container tag?`"
+            "QuestionComposer": "`Container tag?`",
+            "Regex": "^\\S{2,}$"
           }
         },
         {
@@ -308,25 +424,28 @@
           "RunOnlyIfComposer": "()=> '<displayRunningContainers>' == 'Yes'",
           "Command": {
             "CommandComposer": "`docker ps`",
-            "WillDoHintComposer": "Will display the running containers"
+            "WillDoHintComposer": "`Will display the running containers`"
           }
         },
         {
           "Prompt": {
             "VarNameComposer": "`containerName`",
-            "QuestionComposer": "`Container name?`"
+            "QuestionComposer": "`Container name?`",
+            "Regex": "^\\S{2,}$"
           }
         },
         {
           "Prompt": {
             "QuestionComposer": "`Source file/directory path on host?`",
-            "VarNameComposer": "`srcPath`"
+            "VarNameComposer": "`srcPath`",
+            "Regex": "^\\S{4,}$"
           }
         },
         {
           "Prompt": {
             "QuestionComposer": "`Destination path inside the container?`",
-            "VarNameComposer": "`dstPath`"
+            "VarNameComposer": "`dstPath`",
+            "Regex": "^\\S{4,}$"
           }
         },
         {
@@ -343,25 +462,28 @@
         {
           "Command": {
             "CommandComposer": "()=> '<displayRunningContainers>' == 'Yes'",
-            "WillDoHintComposer": "Will display the running containers"
+            "WillDoHintComposer": "`Will display the running containers`"
           }
         },
         {
           "Prompt": {
             "QuestionComposer": "`Container name?`",
-            "VarNameComposer": "`containerName`"
+            "VarNameComposer": "`containerName`",
+            "Regex": "^\\S{2,}$"
           }
         },
         {
           "Prompt": {
             "QuestionComposer": "`Source file/directory path on host?`",
-            "VarNameComposer": "`srcPath`"
+            "VarNameComposer": "`srcPath`",
+            "Regex": "^\\S{4,}$"
           }
         },
         {
           "Prompt": {
             "QuestionComposer": "`Destination path inside the container?`",
-            "VarNameComposer": "`dstPath`"
+            "VarNameComposer": "`dstPath`",
+            "Regex": "^\\S{4,}$"
           }
         },
         {
@@ -389,7 +511,7 @@
         {
           "Command": {
             "CommandComposer": "`g open-old-poyka`",
-            "WillDoHintComposer": "g >> Old Poyka >> Open #legacy"
+            "WillDoHintComposer": "`g >> Old Poyka >> Open #legacy`"
           }
         }
       ]

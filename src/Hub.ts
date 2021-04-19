@@ -1,0 +1,1 @@
+export { CurrentTerminal as Terminal } from "decova-terminal";

@@ -6,7 +6,8 @@ import { DirectoryInfo, FileInfo, Path } from "decova-filesystem";
 export enum CommonDirName
 {
     vscode = ".vscode",
-    decova_gotcha_repo = "decova-gotcha-data"
+    decova_gotcha_repo = "decova-gotcha-data",
+    text_snippets = "text-snippets"
 }
 
 enum CommonFileName
@@ -124,6 +125,12 @@ export class PathMan
     {
         const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonFileName.launch)
         return new FileInfo(path);
+    }
+
+    static get CurrentWorkspace_TextSnippets_Dir(): DirectoryInfo
+    {
+        const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonDirName.text_snippets)
+        return new DirectoryInfo(path);
     }
 
     static get CurrentWorkspace_PackageJson(): FileInfo

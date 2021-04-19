@@ -1,6 +1,7 @@
 import { Process } from "decova-environment";
 import { TerminalAgent } from "../../../external-sheet/TerminalAgent";
 import { ExternalResources } from "../../ExternalResouces";
+import { CommonMenu } from "../CommonMenu";
 import { PathMan } from "../PathMan";
 
 export class GotchaRepo
@@ -35,5 +36,17 @@ export class GotchaRepo
         PathMan.GotchaLocalRepo.SetAsCurrentDirectory()
         await TerminalAgent.AskToRunCommandAsync(`Will push Gotcha's repo commits`, `git push`)
         entryWorkDir.SetAsCurrentDirectory();
+    }
+
+    static async PromptThenCommitAndPushAsync()
+    {
+        TerminalAgent.Hint(`Commit and push changes?`)                                  
+        let go = await CommonMenu.ShowContinueSkipAsync('>>>');
+        if(go)
+        {
+            await GotchaRepo.CommitAsync();
+            await GotchaRepo.PushAsync();
+            // await GotchaRepo.PullAsync();
+        }
     }
 }

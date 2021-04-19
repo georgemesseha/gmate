@@ -1,17 +1,39 @@
 {
-    "Terminal Mcq Prompt":{
+    "Launch_Debug_Mocha": {
+        "prefix": "ss.mocha.launchSettings",
+        "body": [
+            "{\r",
+            "    \"type\": \"node\",\r",
+            "    \"request\": \"launch\",\r",
+            "    \"name\": \"Mocha All\",\r",
+            "    \"program\": \"${workspaceFolder}/node_modules/mocha/bin/_mocha\",\r",
+            "    \"args\": [\r",
+            "        \"-r\",\r",
+            "        \"ts-node/register\",\r",
+            "        \"--timeout\",\r",
+            "        \"999999\",\r",
+            "        \"--colors\",\r",
+            "        \"${workspaceFolder}/modules/**/*-spec.ts\",\r",
+            "    ],\r",
+            "    \"console\": \"integratedTerminal\",\r",
+            "    \"internalConsoleOptions\": \"neverOpen\",\r",
+            "    \"protocol\": \"inspector\"\r",
+            "}"
+        ],
+        "description": "A launch configuration that configure launching mocha test in debug mode"
+    },
+    "Terminal Mcq Prompt": {
         "prefix": "ss.terminal.mcq", // the snippet suggestion code editor show up for you.
         "body": [ // contains the code lines.
             "// npm install --save decova-terminal",
             "// import { CurrentTerminal as Terminal } from \"decova-terminal/CurrentTerminal\";",
-            
             "let ops = { ${1:option1}: '${2:option1 text}'};",
             "let op = await Terminal.McqAsync('${0:question}', ops);",
             "switch(op)",
             "{",
-                "\tcase ops.${1:option1}:",
-                "\t\tconsole.log('ops.${1:option1}');",
-                "\t\tbreak;",
+            "\tcase ops.${1:option1}:",
+            "\t\tconsole.log('ops.${1:option1}');",
+            "\t\tbreak;",
             "}"
         ]
     },
@@ -40,34 +62,5 @@
             "})",
             "});",
         ]
-    },
-    "Gotcha add new Walkthrough": {
-        "prefix": "ss.vscode.QuickPicker",
-        "body": [
-            "const options = new List<QuickOption>(",
-            "[",
-            "{label: 'option1'},",
-            "{label: 'option2'}",
-            "]);",
-            "new QuickPicker(options, (option: QuickOption)=>",
-            "{",
-            "return new Promise((resolve, reject)=>",
-            "{",
-            "switch(option.label)",
-            "{",
-            "case 'option1':",
-            "window.showWarningMessage('This is from option1');",
-            "tr.sendText('>>>>>> this is from option 1')",
-            "break;",
-            "case 'option2':",
-            "tr.sendText('>>>>>> this is from option 2')",
-            "break;",
-            "}",
-            "})",
-            "});",
-        ]
     }
-    
 }
-
-

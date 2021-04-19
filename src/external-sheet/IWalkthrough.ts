@@ -7,4 +7,5 @@ export interface IWalkthrough
     Title: string
     IsCommentedOut: boolean;
     Steps: IStep[];
+    Shortcut: string|undefined;
 }

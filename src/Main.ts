@@ -1,7 +1,7 @@
 //import ch from "chalk";
 // import figlet from "figlet";
 //import * as cp from "child_process"
-import { CurrentTerminal as Terminal } from "decova-terminal";
+import { Terminal } from "./Hub";
 import { DevelopMyPackages } from "./local-tools-impl/__old/DevelopMyPackages";
 import { DevelopMyTools } from "./local-tools-impl/__old/DevelopMyTools";
 import { InsideExistingProject as InsideCurrentProject } from "./local-tools-impl/__old/InsideExistingProject";
@@ -37,7 +37,6 @@ enum NextStepPrompt
 
 export default class Main
 {
-
     private async DoOldBranching()
     {
         let ops = {
@@ -75,14 +74,22 @@ export default class Main
 
     public async TakeControl()
     {
-        
-        if(Process.Current.Args.Any())
+        try
         {
-            await new ExecFromSheet().TakeControlAsync(Process.Current.Args.First());
-        }
-        else
+            if (Process.Current.Args.Any())
+            {
+                await new ExecFromSheet().TakeControlAsync(Process.Current.Args.First());
+            }
+            else
+            {
+                await new ExecFromSheet().TakeControlAsync(null);
+            }
+        } 
+        catch (err)
         {
-            await new ExecFromSheet().TakeControlAsync(null);
+            console.log('//////////////////////////////////////////////////////////////// error')
+            await Terminal.DisplayErrorAsync(err)
+            process.abort()
         }
     }
-}  
+}

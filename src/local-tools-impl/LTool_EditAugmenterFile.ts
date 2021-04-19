@@ -21,14 +21,7 @@ export abstract class LTool_AbstractEditAugmenterFile implements ILocalTool
 
         await TerminalAgent.AskToRunCommandAsync(this.GetHint(), cmd);
 
-        TerminalAgent.Hint(`Answer with 'Continue' when done with editing`)                                  
-        let go = await CommonMenu.ShowContinueSkipAsync('>>>');
-        if(go)
-        {
-            await GotchaRepo.CommitAsync();
-            await GotchaRepo.PushAsync();
-            // await GotchaRepo.PullAsync();
-        }
+        await GotchaRepo.PromptThenCommitAndPushAsync();
 
     }
 
@@ -62,27 +55,7 @@ export class LTool_EditSnippets extends LTool_AbstractEditAugmenterFile
     {
         return PathMan.GotchaLocalRepo_DecovaSnippets.FullName;
     }
-    // async TakeControlAsync(args: string): Promise<void>
-    // {
-    //     const file = PathMan.GotchaLocalRepo_WalkthroughsSheet;
-    //     while(file.Exists() == false)
-    //     {
-    //         await LocalToolsDispatcher.RunAsync(new LTool_CheckGotchaLocalRepo())
-    //     }
 
-    //     await TerminalAgent.AskToRunCommandAsync(`Will open the Gotcha's local repo's decova.code-snippets for editing`, 
-    //                                              `code ${PathMan.GotchaLocalRepo_DecovaSnippets.FullName}`);
-
-    //     TerminalAgent.Hint(`Answer with 'Continue' when done with editing`)                                  
-    //     let go = await CommonMenu.ShowContinueSkipAsync('>>>');
-    //     if(go)
-    //     {
-    //         await GotchaRepo.CommitAsync();
-    //         await GotchaRepo.PushAsync();
-    //         await GotchaRepo.PullAsync();
-    //     }
-
-    // }
     GetHint(): string
     {
         return `Guides you through editing and publishing your code snippets`

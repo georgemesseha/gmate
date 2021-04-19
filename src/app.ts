@@ -1,4 +1,5 @@
 
+import 'decova-dotnet'
 import chalk from "chalk";
 import { Process } from "decova-environment";
 
@@ -12,10 +13,12 @@ import { KeyValuePair, XString } from "decova-dotnet-developer";
 import { LTool_IncrementPatch } from "./local-tools-impl/LTool_IncrementPatch";
 import { DirectoryInfo } from "decova-filesystem";
 import { LTool_CheckGotchaLocalRepo } from "./local-tools-impl/LTool_CheckGotchaLocalRepo";
-import { LTool_EditWalkthroughs, LTool_EditSnippets, LTool_EditLaunchFile } from "./local-tools-impl/LTool_EditAugmenterFile";
-
-
-
+import { LTool_EditWalkthroughs, 
+         LTool_EditSnippets, 
+         LTool_EditLaunchFile } from "./local-tools-impl/LTool_EditAugmenterFile";
+import { LTool_ManageTextSnippets } from "./local-tools-impl/LTool_ManageTextSnippets";
+import { LTool_OpenTextSnippet } from "./local-tools-impl/LTool_OpenTextSnippet";
+import { LTool_CommitAndPushGotchaData } from './local-tools-impl/LTool_CommitAndPushGotchaData';
 
 const pjson = require('../package.json');
 
@@ -47,6 +50,9 @@ export class App
                 new LTool_EditWalkthroughs(),
                 new LTool_EditSnippets(),
                 new LTool_EditLaunchFile(),
+                new LTool_ManageTextSnippets(),
+                new LTool_OpenTextSnippet(),
+                new LTool_CommitAndPushGotchaData()
             )
     }
 
@@ -92,8 +98,3 @@ catch (err)
 {
     console.log(err)
 }
-
-
-
-
-

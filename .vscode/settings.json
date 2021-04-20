@@ -19,16 +19,7 @@
         "menu.selectionForeground": "#616161",
         "menubar.selectionForeground": "#616161",
         "activityBar.activeBorder": "#616161",
-        "editor.findMatchBorder": "#c4f515",
-        "selection.background": "#fd262640"
-    },
-    "json.schemas": [
-        {
-            "fileMatch": [
-                "../gmate-commands-sheet.json"
-            ],
-            "url": "http://decova.com/gmate-commandsheet.jsonhttps://raw.githubusercontent.com/georgemesseha/gmate/master/src/gmate-commands-schema.json"
-        }
-    ],
-    "debug.javascript.unmapMissingSources": true
+        "editor.findMatchBorder": "#616161",
+        "selection.background": "#61616140"
+    }
 }

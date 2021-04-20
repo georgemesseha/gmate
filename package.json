@@ -1,6 +1,6 @@
 {
 	"name": "decova-gotcha",
-	"version": "0.1.165",
+	"version": "0.1.173",
 	"liscense": "",
 	"main": "index.js",
 	"module": "",
@@ -31,12 +31,11 @@
 	],
 	"dependencies": {
 		"chalk": "^4.0.0",
-		"decova-dotnet": "^1.1.1",
+		"decova-dotnet": "^1.1.5",
 		"decova-environment": "0.0.5",
 		"decova-filesystem": "^1.1.56",
 		"decova-json": "0.0.7",
 		"decova-terminal": "^0.1.76",
-		"dotenv": "^8.2.0",
 		"figlet": "^1.4.0",
 		"g": "^2.0.1",
 		"inquirer": "^7.1.0",

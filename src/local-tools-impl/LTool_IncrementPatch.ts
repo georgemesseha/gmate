@@ -15,7 +15,7 @@ export class LTool_IncrementPatch implements ILocalTool
 {
     GetHint(): string
     {
-        return `Increments the patch part of your currently being edited package, and optionally update the dependent workspaces.`
+        return `Patch this package.`
     }
     GetShortcut(): string
     {

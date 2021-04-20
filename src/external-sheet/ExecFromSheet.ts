@@ -20,8 +20,6 @@ import { IAggregator } from "./IAggregator";
 import { _AllowStringsForIds } from "mongoose";
 import { Terminal } from "../Hub";
 
-require('dotenv')
-
 export class ExecFromSheet
 {
     private async HandlePromptTextAsync(prompt: IPrompt, vars: Dictionary<string, string>)
@@ -328,8 +326,6 @@ export class ExecFromSheet
         // #region find and handle a walkthrough
         if(shortcut) 
         {
-            console.log('shortcut detected')
-            console.log(allWks.Select(w=>w.Shortcut).Array)
             await this.HandleWalkthroughOfShortcut(allWks, shortcut);
         }
         else

@@ -24,7 +24,7 @@ export class TerminalAgent
 
     public static Instruct(text: string)
     {
-        CurrentTerminal.Echo(`♣♣♣ ${text}`, Foreground.cyanBright, 
+        CurrentTerminal.Echo(`██►► ${text}`, Foreground.yellow, 
                                           Background.bgBlack, 
                                           2, 
                                           true, 
@@ -109,5 +109,12 @@ export class TerminalAgent
         {
             TerminalAgent.ShowError('Command was cancelled by user!')
         }
+    }
+
+    public static async PickOneAsync(hint: string, options: string[]): Promise<string>
+    {
+        const opsMap:any = {}
+        options.xForeach( op => opsMap[op] = op)
+        return await CurrentTerminal.McqAsync(hint, opsMap) as string
     }
 }

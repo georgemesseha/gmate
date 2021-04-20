@@ -9,7 +9,7 @@ export class LTool_CommitAndPushGotchaData implements ILocalTool
     }
     GetHint(): string
     {
-        return "Commits and pushes the changes in your Gotcha data local repo"
+        return "Push Gotcha's data"
     }
     GetShortcut(): string
     {

@@ -46,10 +46,10 @@ export class PathMan
         return new DirectoryInfo(path);
     }
 
-    static get GotchaLocalRepo_DecovaSnippets(): FileInfo
+    static get GotchaLocalRepo_Vscode_Dir(): DirectoryInfo
     {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.decovaSnippets);
-        return new FileInfo(path);
+        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonDirName.vscode)
+        return new DirectoryInfo(path)
     }
 
     static get GotchaLocalRepo_WalkthroughsSheet(): FileInfo
@@ -58,27 +58,34 @@ export class PathMan
         return new FileInfo(path);
     }
 
-    static get GotchaLocalRepo_WalkthroughsSchema(): FileInfo
-    {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.WalkthroughsSchema);
-        return new FileInfo(path);
-    }
+    // static get GotchaLocalRepo_WalkthroughsSchema(): FileInfo
+    // {
+    //     const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.WalkthroughsSchema);
+    //     return new FileInfo(path);
+    // }
 
     static get GotchaLocalRepo_DecovaSettingsFile(): FileInfo
     {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.decovaSettings);
+        const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.decovaSettings);
         return new FileInfo(path);
     }
 
+    static get GotchaLocalRepo_DecovaSnippets(): FileInfo
+    {
+        const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.decovaSnippets);
+        return new FileInfo(path);
+    }
+
+    
     static get GotchaLocalRepo_LaunchFile(): FileInfo
     {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.launch);
+        const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.launch);
         return new FileInfo(path);
     }
 
     static get GotchaLocalRepo_SettingsFile(): FileInfo
     {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.settings);
+        const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.settings);
         return new FileInfo(path);
     }
 
@@ -127,9 +134,9 @@ export class PathMan
         return new FileInfo(path);
     }
 
-    static get CurrentWorkspace_TextSnippets_Dir(): DirectoryInfo
+    static get GotchaLocalRepo_TextSnippets_Dir(): DirectoryInfo
     {
-        const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonDirName.text_snippets)
+        const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonDirName.text_snippets)
         return new DirectoryInfo(path);
     }
 

@@ -40,7 +40,7 @@ export class LTool_EditLaunchFile extends LTool_AbstractEditAugmenterFile
 
     GetHint(): string
     {
-        return `Guides you through editing and publishing Gotcha's augmenter launch settings`
+        return `Edit launch configuration file`
     }
     GetShortcut(): string
     {
@@ -58,7 +58,7 @@ export class LTool_EditSnippets extends LTool_AbstractEditAugmenterFile
 
     GetHint(): string
     {
-        return `Guides you through editing and publishing your code snippets`
+        return `Edit my code snippets`
     }
     GetShortcut(): string
     {
@@ -97,7 +97,7 @@ export class LTool_EditWalkthroughs extends LTool_AbstractEditAugmenterFile
     // }
     GetHint(): string
     {
-        return `Guides you through editing and publishing your Walkthrougs`
+        return `Edit my Walkthroughs`
     }
     GetShortcut(): string
     {

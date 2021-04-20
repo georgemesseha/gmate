@@ -12,11 +12,11 @@ export class LTool_CheckGotchaLocalRepo implements ILocalTool
 {
     GetHint(): string
     {
-        return `Will make sure you locally have Gotcha's repo.`
+        return `Pull Gotcha's data.`
     }
     GetShortcut(): string
     {
-        return 'check-repo'
+        return 'pull'
     }
 
     

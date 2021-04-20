@@ -19,6 +19,7 @@ import { LTool_EditWalkthroughs,
 import { LTool_ManageTextSnippets } from "./local-tools-impl/LTool_ManageTextSnippets";
 import { LTool_OpenTextSnippet } from "./local-tools-impl/LTool_OpenTextSnippet";
 import { LTool_CommitAndPushGotchaData } from './local-tools-impl/LTool_CommitAndPushGotchaData';
+import { LTool_CopyVscodeFile } from './local-tools-impl/LTool_CopyVscodeFile';
 
 const pjson = require('../package.json');
 
@@ -52,7 +53,8 @@ export class App
                 new LTool_EditLaunchFile(),
                 new LTool_ManageTextSnippets(),
                 new LTool_OpenTextSnippet(),
-                new LTool_CommitAndPushGotchaData()
+                new LTool_CommitAndPushGotchaData(),
+                new LTool_CopyVscodeFile()
             )
     }
 

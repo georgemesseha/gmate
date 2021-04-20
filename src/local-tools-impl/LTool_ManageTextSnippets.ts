@@ -9,14 +9,15 @@ export class LTool_ManageTextSnippets implements ILocalTool
 {
     async TakeControlAsync(args: string): Promise<void>
     {
-        PathMan.CurrentWorkspace_TextSnippets_Dir.Ensure();
-        CurrentTerminal.Exec(`start ${PathMan.CurrentWorkspace_TextSnippets_Dir.FullName}`)
+        const dir = PathMan.GotchaLocalRepo_TextSnippets_Dir
+        dir.Ensure();
+        CurrentTerminal.Exec(`start ${dir.FullName}`)
 
         await GotchaRepo.PromptThenCommitAndPushAsync();
     }
     GetHint(): string
     {
-        return "Opens your text snippets folder to manage do your editing then guides you to commit and push."
+        return "Edit my text snippets folder."
     }
     GetShortcut(): string
     {

@@ -70,7 +70,7 @@ export class App
         {
             // #region try local tool first
             const nextArgs = String.xJoin('', Process.Current.Args.xSkip(1));
-            const isLocalTool = await this.srv_LocalToolsDispatcher.TryAimTool(arg0, nextArgs);
+            const isLocalTool = await this.srv_LocalToolsDispatcher.TryAimToolAsync(arg0, nextArgs);
             // #endregion
 
             // #region if it's not a local tool, consult sheet

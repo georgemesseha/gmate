@@ -197,21 +197,14 @@ export class ExecFromSheet
             const ans = await CommonMenu.ShowContinueSkipAsync('>>>')
             if (ans)
             {
-                const commandParts = (output as string).split(/\s+/g)
-                if(commandParts.xCount() < 2 || 
-                   commandParts[0].toLowerCase() != "g")
-                {
-                    TerminalAgent.Exec(output as string)
-                }
-
+                const commandParts = (output as string).split(/\s+/g);
                 const args = commandParts.length < 3? '' : commandParts.xSkip(2).join(' ');
-                const itWasLocalTool = this.srv_LocalToolsDispatcher.TryAimTool(commandParts[1], args);
-                
+                const itWasLocalTool = await this.srv_LocalToolsDispatcher.TryAimToolAsync(commandParts[1], args);
+
                 if(!itWasLocalTool)
                 {
                     TerminalAgent.Exec(output as string)
-                }
-                
+                }             
             }
             else
             {
@@ -321,7 +314,7 @@ export class ExecFromSheet
         while (this.srv_WalkthroughsSheet.FileExists() == false)
         {
             TerminalAgent.ShowError(`Walkthroughs sheet doesn't exist in the local repo!`)
-            await LocalToolsDispatcher.RunAsync(new LTool_CheckOutGotchaLocalRepo())
+            await LocalToolsDispatcher.RunAsync(this.srv_LTool_CheckGotchaLocalRepo)
             TerminalAgent.Hint(this.srv_PathMan.GotchaLocalRepo_WalkthroughsSheet.FullName)
         }
 

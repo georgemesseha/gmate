@@ -50,7 +50,7 @@ export class LTool_IncrementPatch implements AbstractLocalTool
         const approved = await TerminalAgent.YesNoQuestionAsync('Update as the minimum for dependent workspaces?');
 
         // const qUpdateDependentWorkspaces = new Intellisense<string>(["Yes", "No"], op=>op);
-        // const ans = await qUpdateDependentWorkspaces.PromptAsync('Update as the minimum for dependent workspaces?');
+        // const approved = await qUpdateDependentWorkspaces.PromptAsync('Update as the minimum for dependent workspaces?');
 
         if(approved)
         {
@@ -71,7 +71,7 @@ export class LTool_IncrementPatch implements AbstractLocalTool
         }
         catch(err)
         {
-            TerminalAgent.ShowError(`Couldn't load package.json from current directory [${DirectoryInfo.Current.FullName}]`)
+            TerminalAgent.ShowError(`Couldn't load package.json from current directory [${DirectoryInfo.Current.FullName}]`);
             return false;
         }
         try

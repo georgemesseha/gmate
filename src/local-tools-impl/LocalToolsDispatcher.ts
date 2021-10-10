@@ -59,7 +59,7 @@ export class LocalToolsDispatcher
             })
     }
 
-    public async TryAimTool(shortcut: string, args: string): Promise<boolean>
+    public async TryAimToolAsync(shortcut: string, args: string): Promise<boolean>
     {
         if(this._local_tools_dictionary.xContains(shortcut) == false)
         {

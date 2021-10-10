@@ -5,23 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
-            "request": "launch",
-            "name": "Mocha All",
-            "program": "workspaceFolder/node_modules/mocha/bin/_mocha",
-            "args": [
-                "-r",
-                "ts-node/register",
-                "--timeout",
-                "999999",
-                "--colors",
-                "workspaceFolder/modules/**/*-spec.ts",
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "protocol": "inspector"
-        },
-        {
             "name": "Attach by Process ID",
             "processId": "${command:PickProcess}",
             "request": "attach",
@@ -39,8 +22,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],          
-            "program": "${workspaceFolder}\\index.js",
-            "args": ["find-process-whose-port"],
+            "program": "${workspaceFolder}\\dist\\App.js",
+            "args": ["++"],
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ]

@@ -2,19 +2,23 @@
 // import figlet from "figlet";
 //import * as cp from "child_process"
 import { CurrentTerminal as Terminal } from "decova-terminal";
+import { container, singleton } from "tsyringe";
 import { DevelopMyTools_Poyka } from "./DevelopMyTools/DevelopMyTools_Poyka";
 
+@singleton()
 export class DevelopMyTools
 {
-    private static _decova_terminal_project_dir = "G:\\_MyProjects\\_MyNodeProjects\\decova-terminal";
-    private static async _DevelopDecovaTerminal()
+    private readonly srv_DevelopMyTools_Poyka = container.resolve(DevelopMyTools_Poyka);
+
+    private _decova_terminal_project_dir = "G:\\_MyProjects\\_MyNodeProjects\\decova-terminal";
+    private async _DevelopDecovaTerminal()
     {
         await Terminal.HintBeforeLaunchAsync("Press Enter to launch Decova.Terminal project");
         Terminal.Exec(`code "${this._decova_terminal_project_dir}"`);
     }
 
-    private static projectDir = "G:\\_MyProjects\\_VSCode Extensions\\decova-snippets";
-    public static async _DevelopDecovaSnippetsAddon()
+    private projectDir = "G:\\_MyProjects\\_VSCode Extensions\\decova-snippets";
+    public async _DevelopDecovaSnippetsAddon()
     {
         let ops = { edit: 'Edit' };
         let selected = await Terminal.McqAsync('>>:', ops);
@@ -37,12 +41,12 @@ export class DevelopMyTools
         
     }
 
-    private static async _EditPoykaCodeSnippets()
+    private async _EditPoykaCodeSnippets()
     {
         // cursor here
     }
 
-    public static async TakeControl()
+    public async TakeControl()
     {
         // npm install --save decova-terminal
         // import { CurrentTerminal as Terminal } from "decova-terminal/CurrentTerminal";
@@ -60,7 +64,7 @@ export class DevelopMyTools
                 break;
 
             case ops.developPoyka:
-                await DevelopMyTools_Poyka.TakeControl();
+                await this.srv_DevelopMyTools_Poyka.TakeControl();
                 break;
 
             case ops.decovaTerminal:

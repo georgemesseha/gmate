@@ -13,7 +13,7 @@ export class WorkspaceAugmenter
     private static get PoykaWorkSpace(): DirectoryInfo|null
     {
         const thisJsCodeFile = new FileInfo(__filename);
-        return thisJsCodeFile.Directory.FindAncestor(d=>d.GetFiles().Any(f=>f.Name.toLowerCase() == 'package.json'));
+        return thisJsCodeFile.Directory.FindAncestor(d=>d.GetFiles().xAny(f=>f.Name.toLowerCase() == 'package.json'));
     }
 
     private static EnsureWholeFileContentPublished(... fileNames: string[])

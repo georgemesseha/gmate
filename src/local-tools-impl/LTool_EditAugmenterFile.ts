@@ -1,27 +1,34 @@
 import { TerminalAgent } from "../external-sheet/TerminalAgent";
 import { GotchaRepo } from "./Techies/ArtifactMan/GotchaRepo";
-import { ILocalTool, LocalToolsDispatcher } from "./LocalToolsDispatcher";
-import { LTool_CheckGotchaLocalRepo } from "./LTool_CheckGotchaLocalRepo";
+import { LocalToolsDispatcher } from "./LocalToolsDispatcher";
+import { LTool_CheckOutGotchaLocalRepo } from "./LTool_CheckGotchaLocalRepo";
 import { CommonMenu } from "./Techies/CommonMenu";
 import { PathMan } from "./Techies/PathMan";
 import os from "os";
-export abstract class LTool_AbstractEditAugmenterFile implements ILocalTool
+import { container, singleton } from "tsyringe";
+import { AbstractLocalTool } from "./Techies/AbstractLocalTool";
+export abstract class LTool_AbstractEditAugmenterFile implements AbstractLocalTool
 {
+    protected readonly srv_PathMan = container.resolve(PathMan);
+    protected readonly srv_GotchaRepo = container.resolve(GotchaRepo);
+
     async TakeControlAsync(args: string): Promise<void>
     {
-        const file = PathMan.GotchaLocalRepo_WalkthroughsSheet;
+        
+        const file = this.srv_PathMan.GotchaLocalRepo_WalkthroughsSheet;
         while(file.Exists() == false)
         {
             TerminalAgent.ShowError(`File [${file.FullName}] doesn't exist. I'll try to check out the repo.`)
-            await LocalToolsDispatcher.RunAsync(new LTool_CheckGotchaLocalRepo())
+            await LocalToolsDispatcher.RunAsync(new LTool_CheckOutGotchaLocalRepo())
         }
 
         const cmd = os.platform() == "win32"? `code ${this.FilePath}`
                                             : `sudo code --user-data-dir="~/.vscode-root" ${this.FilePath}`
 
-        await TerminalAgent.AskToRunCommandAsync(this.GetHint(), cmd);
+        TerminalAgent.Hint(this.GetHint());
+        await TerminalAgent.AskToRunCommandAsync(cmd);
 
-        await GotchaRepo.PromptThenCommitAndPushAsync();
+        await this.srv_GotchaRepo.PromptThenCommitAndPushAsync();
 
     }
 
@@ -31,11 +38,12 @@ export abstract class LTool_AbstractEditAugmenterFile implements ILocalTool
     abstract FilePath: string;
 }
 
+@singleton()
 export class LTool_EditLaunchFile extends LTool_AbstractEditAugmenterFile
 {
     public get FilePath()
     {
-        return PathMan.GotchaLocalRepo_LaunchFile.FullName;
+        return this.srv_PathMan.GotchaLocalRepo_LaunchFile.FullName;
     }
 
     GetHint(): string
@@ -49,11 +57,12 @@ export class LTool_EditLaunchFile extends LTool_AbstractEditAugmenterFile
 
 }
 
+@singleton()
 export class LTool_EditSnippets extends LTool_AbstractEditAugmenterFile
 {
     public get FilePath(): string
     {
-        return PathMan.GotchaLocalRepo_DecovaSnippets.FullName;
+        return this.srv_PathMan.GotchaLocalRepo_DecovaSnippets.FullName;
     }
 
     GetHint(): string
@@ -67,11 +76,12 @@ export class LTool_EditSnippets extends LTool_AbstractEditAugmenterFile
 
 }
 
+@singleton()
 export class LTool_EditWalkthroughs extends LTool_AbstractEditAugmenterFile
 {
     public get FilePath()
     {
-        return PathMan.GotchaLocalRepo_WalkthroughsSheet.FullName;
+        return this.srv_PathMan.GotchaLocalRepo_WalkthroughsSheet.FullName;
     }
 
     // async TakeControlAsync(args: string): Promise<void>

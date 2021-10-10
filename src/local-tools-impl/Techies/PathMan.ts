@@ -1,12 +1,15 @@
-import { Process } from "decova-environment";
+import { Exception_InvalidProgramState } from "decova-dotnet";
+import { Environment, Process } from "decova-environment";
 import { DirectoryInfo, FileInfo, Path } from "decova-filesystem";
+import { injectable, singleton } from "tsyringe";
 
 
 
 export enum CommonDirName
 {
     vscode = ".vscode",
-    decova_gotcha_repo = "decova-gotcha-data",
+    gotcha_main_dir = "decova-gotcha-data",
+    // decova_gotcha_repo = "decova-gotcha-data",
     text_snippets = "text-snippets"
 }
 
@@ -23,38 +26,58 @@ enum CommonFileName
 }
 
 
+@singleton()
 export class PathMan
 {
-    static get GotchaMainDir(): DirectoryInfo
+    private _UserProfileDir: DirectoryInfo;
+    get UserProfileDir(): DirectoryInfo
     {
-       
-        return new DirectoryInfo(process.env.RootDir as string)
+        if(this._UserProfileDir) return this._UserProfileDir
+
+        if(!process.env.USERPROFILE)
+        {
+            throw new Exception_InvalidProgramState("process.env.USERPROFILE", "process.env.USERPROFILE is empty or undefined");
+        }
+
+        this._UserProfileDir = new DirectoryInfo(process.env.USERPROFILE!);
+        return this._UserProfileDir;
     }
 
-    static get GotchaLocalRepo(): DirectoryInfo
+    private _GotchaMainDir: DirectoryInfo;
+    get GotchaMainDir(): DirectoryInfo
     {
-        const path = Path.Join(this.GotchaMainDir.FullName, 
-                               CommonDirName.decova_gotcha_repo,
-                               );
+        if(this._GotchaMainDir) return this._GotchaMainDir;
 
-        return new DirectoryInfo(path);
+        this._GotchaMainDir = new DirectoryInfo(`${this.UserProfileDir.FullName}\\${CommonDirName.gotcha_main_dir}`);
+        this._GotchaMainDir.Ensure();
+        return this._GotchaMainDir;
     }
 
-    static get GotchaLocalRepoGitDir(): DirectoryInfo
-    {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, ".git");
-        return new DirectoryInfo(path);
-    }
+    // static get GotchaLocalDataDir(): DirectoryInfo
+    // {
+    //     const path = Path.Join(this.GotchaMainDir.FullName);
+    //     const rootDataDir = new DirectoryInfo(path);
+    //     rootDataDir.Ensure();
 
-    static get GotchaLocalRepo_Vscode_Dir(): DirectoryInfo
+    //     return rootDataDir;
+    // }
+
+    // static get GotchaLocalRepoGitDir(): DirectoryInfo
+    // {
+    //     const path = Path.Join(this.GotchaLocalDataDir.FullName, ".git");
+    //     return new DirectoryInfo(path);
+    // }
+
+    get GotchaLocalRepo_Vscode_Dir(): DirectoryInfo
     {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonDirName.vscode)
+        const path = Path.Join(this.GotchaMainDir.FullName, CommonDirName.vscode)
         return new DirectoryInfo(path)
     }
 
-    static get GotchaLocalRepo_WalkthroughsSheet(): FileInfo
+    get GotchaLocalRepo_WalkthroughsSheet(): FileInfo
     {
-        const path = Path.Join(this.GotchaLocalRepo.FullName, CommonFileName.WalkthroughsSheet);
+        
+        const path = Path.Join(this.GotchaMainDir.FullName, CommonFileName.WalkthroughsSheet);
         return new FileInfo(path);
     }
 
@@ -64,39 +87,39 @@ export class PathMan
     //     return new FileInfo(path);
     // }
 
-    static get GotchaLocalRepo_DecovaSettingsFile(): FileInfo
+    get GotchaLocalRepo_DecovaSettingsFile(): FileInfo
     {
         const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.decovaSettings);
         return new FileInfo(path);
     }
 
-    static get GotchaLocalRepo_DecovaSnippets(): FileInfo
+    get GotchaLocalRepo_DecovaSnippets(): FileInfo
     {
         const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.decovaSnippets);
         return new FileInfo(path);
     }
 
     
-    static get GotchaLocalRepo_LaunchFile(): FileInfo
+    get GotchaLocalRepo_LaunchFile(): FileInfo
     {
         const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.launch);
         return new FileInfo(path);
     }
 
-    static get GotchaLocalRepo_SettingsFile(): FileInfo
+    get GotchaLocalRepo_SettingsFile(): FileInfo
     {
         const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonFileName.settings);
         return new FileInfo(path);
     }
 
 
-    static get CurrentWorkspace(): DirectoryInfo
+    get CurrentWorkspace(): DirectoryInfo
     {
         return DirectoryInfo.Current;
     }
 
 
-    static get CurrentWorkspace_VsCodeDir(): DirectoryInfo
+    get CurrentWorkspace_VsCodeDir(): DirectoryInfo
     {
         const path = Path.Join(this.CurrentWorkspace.FullName, CommonDirName.vscode)
         return new DirectoryInfo(path);
@@ -104,43 +127,43 @@ export class PathMan
 
     
 
-    static get CurrentWorkspace_DecovaSettings(): FileInfo
+    get CurrentWorkspace_DecovaSettings(): FileInfo
     {
         const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonFileName.decovaSettings)
         return new FileInfo(path);
     }
 
-    static get CurrentWorkspace_Settings(): FileInfo
+    get CurrentWorkspace_Settings(): FileInfo
     {
         const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonFileName.settings)
         return new FileInfo(path);
     }
 
-    static get CurrentWorkspace_Tasks(): FileInfo
+    get CurrentWorkspace_Tasks(): FileInfo
     {
         const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonFileName.tasksJson)
         return new FileInfo(path);
     }
 
-    static get CurrentWorkspace_DecovaSnippets(): FileInfo
+    get CurrentWorkspace_DecovaSnippets(): FileInfo
     {
         const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonFileName.decovaSnippets)
         return new FileInfo(path);
     }
 
-    static get CurrentWorkspace_Lanuch(): FileInfo
+    get CurrentWorkspace_Lanuch(): FileInfo
     {
         const path = Path.Join(this.CurrentWorkspace_VsCodeDir.FullName, CommonFileName.launch)
         return new FileInfo(path);
     }
 
-    static get GotchaLocalRepo_TextSnippets_Dir(): DirectoryInfo
+    get GotchaLocalRepo_TextSnippets_Dir(): DirectoryInfo
     {
         const path = Path.Join(this.GotchaLocalRepo_Vscode_Dir.FullName, CommonDirName.text_snippets)
         return new DirectoryInfo(path);
     }
 
-    static get CurrentWorkspace_PackageJson(): FileInfo
+    get CurrentWorkspace_PackageJson(): FileInfo
     {
         const path = Path.Join(this.CurrentWorkspace.FullName, CommonFileName.packgeJson)
         return new FileInfo(path);

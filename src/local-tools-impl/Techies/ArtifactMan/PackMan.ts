@@ -1,19 +1,21 @@
+import path from 'path';
 import { DirectoryInfo, Encoding, FileInfo } from "decova-filesystem";
-import { List, Exception, SemVersion } from "decova-dotnet-developer";
 import { Json } from "decova-json";
 import { Process, Environment } from 'decova-environment'
-import path from 'path';
 import { CurrentTerminal } from "decova-terminal";
 import { PackageJson } from "../Package-General/PackageJson";
 import { DecovaSettings } from "./DecovaSettings";
 import { PathMan } from "../PathMan";
 import { TerminalAgent } from "../../../external-sheet/TerminalAgent";
+import { container, inject } from "tsyringe";
+import { Exception } from "decova-dotnet";
 
 
 export class PackMan
 {
     private _filePath: string;
     private _manifest: PackageJson;
+    private srv_PathMan: PathMan = container.resolve<PathMan>(PathMan);
 
     constructor(public PackageDir: string)
     {
@@ -32,41 +34,41 @@ export class PackMan
         }
     }
 
-    public GetProjectsContainerDirs(): List<DirectoryInfo>
+    public GetProjectsContainerDirs(): DirectoryInfo[]
     {
         const workSpace = Process.Current.CurrentWorkingDirectory.FullName;
-        const decovaSettingsFile = PathMan.CurrentWorkspace_DecovaSettings.FullName;
+        const decovaSettingsFile = this.srv_PathMan.CurrentWorkspace_DecovaSettings.FullName;
         let decovaSettings = Json.Load<DecovaSettings>(decovaSettingsFile);
-        return new List<string>(decovaSettings.nodeProjectsContainers).Select(path => new DirectoryInfo(path));
+        return decovaSettings.nodeProjectsContainers.xSelect(path => new DirectoryInfo(path));
     }
 
-    public GetAllProjectManifests(): List<PackageJson>
+    public GetAllProjectManifests(): PackageJson[]
     {
         function isProjectDir(dir: DirectoryInfo): boolean
         {
-            return dir.GetFiles().Any(f => f.Name.toLowerCase() == 'package.json');
+            return dir.GetFiles().xAny(f => f.Name.toLowerCase() == 'package.json');
         }
         function getManifestFile(projDir: DirectoryInfo): FileInfo
         {
             return new FileInfo(path.join(projDir.FullName, 'package.json'));
         }
         const allProjectDirs = this.GetProjectsContainerDirs()
-            .SelectMany(d => d.GetDirectories())
-            .Where(d => isProjectDir(d));
-        const allPackgeJsonFiles = allProjectDirs.Select(d => getManifestFile(d));
+            .xFlatten(d => d.GetDirectories())
+            .xWhere(d => isProjectDir(d));
+        const allPackgeJsonFiles = allProjectDirs.xSelect(d => getManifestFile(d));
 
-        return allPackgeJsonFiles.Select(f => new PackageJson(f.FullName));
+        return allPackgeJsonFiles.xSelect(f => new PackageJson(f.FullName));
     }
 
-    public GetDependentManifests(): List<PackageJson>
+    public GetDependentManifests(): PackageJson[]
     {
-        return this.GetAllProjectManifests().Where(m => m.Dependencies.Contains(this._manifest.name));
+        return this.GetAllProjectManifests().xWhere(m => m.Dependencies.xContains(this._manifest.name));
     }
 
     public UpdateLeastVersionOnDependents()
     {
         const allDependencies = this.GetDependentManifests();
-        if (allDependencies.Count == 0)
+        if (allDependencies.xCount() == 0)
         {
             CurrentTerminal.DisplayInfo(`No dependent workspaces detected!`)
         }
@@ -86,7 +88,7 @@ export class PackMan
                     TerminalAgent.ShowError(`Failed to update [${dependentManifest.name}] with patch of [${this._manifest.name}:^${this._manifest.version}].`);
                 }
             }
-            allDependencies.Foreach(dp => updateDependencyVersion(dp));
+            allDependencies.xForeach(dp => updateDependencyVersion(dp));
         }
     }
 }

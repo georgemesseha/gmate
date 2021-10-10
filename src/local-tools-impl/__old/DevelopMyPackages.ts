@@ -2,11 +2,13 @@
 // import figlet from "figlet";
 //import * as cp from "child_process"
 import {CurrentTerminal as Terminal} from "decova-terminal";
+import { singleton } from "tsyringe";
 
 
+@singleton()
 export class DevelopMyPackages
 {
-    public static async TakeControl()
+    public async TakeControl()
     {
         // npm install --save decova-terminal
         // import { CurrentTerminal as Terminal } from "decova-terminal/CurrentTerminal";
@@ -18,7 +20,7 @@ export class DevelopMyPackages
         switch(op)
         {
             case ops.decova_dotnet:
-                Terminal.Exec(`code "G:\\_MyProjects\\_MyNodeProjects\\decova-dotnet-developer"`);
+                Terminal.Exec(`code "G:\\_MyProjects\\_MyNodeProjects\\decova-dotnet"`);
                 break;
             case ops.decova_FileSystem:
                 Terminal.Exec(`code "G:\\_MyProjects\\_MyNodeProjects\\decova-filesystem"`);

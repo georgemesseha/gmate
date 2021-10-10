@@ -1,11 +1,16 @@
-import { ILocalTool } from "./LocalToolsDispatcher";
+import { container, singleton } from "tsyringe";
+import { AbstractLocalTool } from "./Techies/AbstractLocalTool";
+// import { ILocalTool } from "./LocalToolsDispatcher";
 import { GotchaRepo } from "./Techies/ArtifactMan/GotchaRepo";
 
-export class LTool_CommitAndPushGotchaData implements ILocalTool
+@singleton()
+export class LTool_CommitAndPushGotchaData extends AbstractLocalTool
 {
+    private readonly srv_GotchaRepo = container.resolve(GotchaRepo);
+
     async TakeControlAsync(args: string): Promise<void>
     {
-        await GotchaRepo.PromptThenCommitAndPushAsync()
+        await this.srv_GotchaRepo.PromptThenCommitAndPushAsync()
     }
     GetHint(): string
     {

@@ -1,19 +1,24 @@
 import { Path } from "decova-filesystem";
 import { CurrentTerminal } from "decova-terminal";
+import { container, singleton } from "tsyringe";
 import { TerminalAgent } from "../external-sheet/TerminalAgent";
-import { ILocalTool } from "./LocalToolsDispatcher";
+import { AbstractLocalTool } from "./Techies/AbstractLocalTool";
+// import { ILocalTool } from "./LocalToolsDispatcher";
 import { PathMan } from "./Techies/PathMan";
 
-export class LTool_OpenTextSnippet implements ILocalTool
+@singleton()
+export class LTool_OpenTextSnippet implements AbstractLocalTool
 {
+    private readonly srv_PathMan = container.resolve(PathMan);
+
     async TakeControlAsync(args: string): Promise<void>
     {
-        const dir = PathMan.GotchaLocalRepo_TextSnippets_Dir
+        const dir = this.srv_PathMan.GotchaLocalRepo_TextSnippets_Dir
         dir.Ensure()
 
-        let fileNames = dir.GetFiles().Select(f=>f.Name)
+        let fileNames = dir.GetFiles().xSelect(f=>f.Name)
         let options:any = {}
-        fileNames.Foreach(fn=> options[fn] = fn)
+        fileNames.xForeach(fn=> options[fn] = fn)
 
         const fileName = await CurrentTerminal.McqAsync("Pick a text snippet", options)
         console.log('fileName', fileName)

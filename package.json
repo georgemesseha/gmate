@@ -1,6 +1,6 @@
 {
 	"name": "decova-gotcha",
-	"version": "0.1.173",
+	"version": "0.1.190",
 	"liscense": "",
 	"main": "index.js",
 	"module": "",
@@ -9,7 +9,7 @@
 	"inlineSourceMap": false,
 	"outDir": "",
 	"scripts": {
-		"start": "node index.js",
+		"start": "tsc & node ./dist/app.js",
 		"test": "tsc & npm publish & npm i -g poyka & ggg",
 		"build": "tsc & node ./dist/app.js",
 		"push": "tsc & npm publish & npm i -g poyka & ggg"
@@ -31,9 +31,9 @@
 	],
 	"dependencies": {
 		"chalk": "^4.0.0",
-		"decova-dotnet": "^1.1.5",
-		"decova-environment": "0.0.5",
-		"decova-filesystem": "^1.1.56",
+		"decova-dotnet": "^1.1.73",
+		"decova-environment": "0.0.8",
+		"decova-filesystem": "^1.1.59",
 		"decova-json": "0.0.7",
 		"decova-terminal": "^0.1.76",
 		"figlet": "^1.4.0",
@@ -42,7 +42,9 @@
 		"inquirer-autocomplete-prompt": "^1.3.0",
 		"mongoose": "^5.11.18",
 		"os": "^0.1.1",
-		"require": "^2.4.20"
+		"reflect-metadata": "^0.1.13",
+		"require": "^2.4.20",
+		"tsyringe": "^4.6.0"
 	},
 	"bin": {
 		"g": "./index.js",

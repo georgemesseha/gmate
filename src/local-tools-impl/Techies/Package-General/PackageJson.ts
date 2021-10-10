@@ -1,5 +1,6 @@
-import { List, Dictionary, SemVersion } from "decova-dotnet-developer";
 import { Json } from "decova-json";
+import 'decova-dotnet'
+import { SemVersion } from "decova-dotnet";
 
 // interface LooseObject {
 //     [key: string]: any
@@ -22,42 +23,43 @@ export class PackageJson
     public inlineSourceMap: boolean = false;
     public outDir: string = '';
     public scripts: string[] = [];
-    public get Scripts(): List<String>
+
+    public get Scripts(): string[]
     {
-        return new List<string>(this.scripts);
+        return this.scripts;
     }
     public files: string[] = [];
-    public get Files(): List<String>
+    public get Files(): string[]
     {
-        return new List<string>(this.files);
+        return this.files;
     }
     public keywords: string[] = [];
-    public get Keywords(): List<String>
+    public get Keywords(): string[]
     {
-        return new List<string>(this.keywords);
+        return this.keywords;
     }
     public dependencies: object = new Object();
-    public get Dependencies(): Dictionary<string, string>
+    public get Dependencies(): Map<string, string>
     {
-        return Dictionary.FromObjectProps<string>(this.dependencies);
+        return Map.FromObjectProps<string>(this.dependencies);
+        // return Dictionary.FromObjectProps<string>(this.dependencies);
     }
 
     public HasAsDependency(depName: string)
     {
-        return new List<string>(Object.getOwnPropertyNames(this.dependencies))
-                .Any(p => p == depName) 
+        return Object.getOwnPropertyNames(this.dependencies).xAny(p => p == depName) 
     }
 
 
     public bin: object = new Object();
-    public get Bin(): Dictionary<string, string>
+    public get Bin(): Map<string, string>
     {
-        return Dictionary.FromObjectProps<string>(this.bin);
+        return Map.FromObjectProps<string>(this.bin);
     }
     public devDependencies: object = new Object();
-    public get DevDependencies(): Dictionary<string, string>
+    public get DevDependencies(): Map<string, string>
     {
-        return Dictionary.FromObjectProps<string>(this.devDependencies);
+        return Map.FromObjectProps<string>(this.devDependencies);
     }
 
     public SaveAs(filePath: string)

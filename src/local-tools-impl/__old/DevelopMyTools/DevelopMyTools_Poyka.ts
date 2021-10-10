@@ -2,32 +2,35 @@
 //import ch from 'chalk';
 import {CurrentTerminal as Terminal} from "decova-terminal";
 import path from 'path'
+import { container, singleton } from "tsyringe";
 import { PathMan } from "../../../local-tools-impl/Techies/PathMan";
 
-
+@singleton()
 export class DevelopMyTools_Poyka
 {
-    private static _projectDir =  "G:\\_MyProjects\\_MyNodeProjects\\Poyka";
+    private readonly srv_PathMan = container.resolve(PathMan);
+    
+    private _projectDir =  "G:\\_MyProjects\\_MyNodeProjects\\Poyka";
 
-    private static async _NewBranch()
+    private async _NewBranch()
     {
         await Terminal.InstructAsync("Create [/src/MyBranch/MyBranch.ts]", 'Press ENTER when done.');
         await Terminal.InstructAsync("Create public static TakeControl() method and use it in the designed place.", 'Press ENTER when done');
     }
 
-    private static async _EditCodeSnippets()
+    private async _EditCodeSnippets()
     {
         Terminal.Exec(`cd "${this._projectDir}"`);
         await Terminal.HintBeforeLaunchAsync('Press ENTER to take you to Poyka/snippets');
         Terminal.Exec(`code ${this._projectDir}`);
-        Terminal.Exec(`code ` + PathMan.CurrentWorkspace_DecovaSnippets.FullName);
+        Terminal.Exec(`code ` + this.srv_PathMan.CurrentWorkspace_DecovaSnippets.FullName);
         await Terminal.InstructAsync(`Make your edits!`, `$$$Press ENTER when done!`);
         await Terminal.ConfirmAsync(`Ready for publishing Poyka?`);
         Terminal.Exec('g "++"');
         await Terminal.InstructAsync('Ctrl + Shift + B >> Build & Publish', `VOILA`);
     }
 
-    public static async TakeControl()
+    public async TakeControl()
     {
        //#region open project directory
        //await Terminal.AskForTextAsync(`>>> Press Enter to open Poyka project`);

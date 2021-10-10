@@ -2,12 +2,10 @@ import { WalkthroughsSheet } from "./WalkthroughsSheet";
 import { StepType } from "./StepType";
 import { ICmdSheet } from "./ICmdSheet";
 import { IWalkthrough } from "./IWalkthrough";
-
-import { Dictionary, Exception, List, XString } from "decova-dotnet-developer";
 import { Intellisense } from "./Intellisense";
 import { TerminalAgent } from "./TerminalAgent";
-import { LTool_CheckGotchaLocalRepo } from "../local-tools-impl/LTool_CheckGotchaLocalRepo";
-import { ILocalTool, LocalToolsDispatcher } from "../local-tools-impl/LocalToolsDispatcher";
+import { LTool_CheckOutGotchaLocalRepo } from "../local-tools-impl/LTool_CheckGotchaLocalRepo";
+// import { ILocalTool, LocalToolsDispatcher } from "../local-tools-impl/LocalToolsDispatcher";
 import { CommonMenu } from "../local-tools-impl/Techies/CommonMenu";
 import { PathMan } from "../local-tools-impl/Techies/PathMan";
 import { IStep } from "./Step";
@@ -19,10 +17,19 @@ import { IRepeater } from "./IRepeater";
 import { IAggregator } from "./IAggregator";
 import { _AllowStringsForIds } from "mongoose";
 import { Terminal } from "../Hub";
+import { container } from "tsyringe";
+import { AbstractLocalTool } from "../local-tools-impl/Techies/AbstractLocalTool";
+import { LocalToolsDispatcher } from "../local-tools-impl/LocalToolsDispatcher";
+import { Exception } from "decova-dotnet";
 
 export class ExecFromSheet
 {
-    private async HandlePromptTextAsync(prompt: IPrompt, vars: Dictionary<string, string>)
+    private readonly srv_PathMan = container.resolve(PathMan);
+    private readonly srv_WalkthroughsSheet = container.resolve(WalkthroughsSheet);
+    private readonly srv_LTool_CheckGotchaLocalRepo = container.resolve(LTool_CheckOutGotchaLocalRepo);
+    private readonly srv_LocalToolsDispatcher = container.resolve(LocalToolsDispatcher);
+
+    private async HandlePromptTextAsync(prompt: IPrompt, vars: Map<string, string>)
     {
         if(!prompt) TerminalAgent.ShowError(`prompt argument cannot be null 8912`) 
         if(!vars) TerminalAgent.ShowError(`vars argument cannot be null`)
@@ -47,7 +54,7 @@ export class ExecFromSheet
             
             // console.log('just before use of string ext .IsWhiteSpace')
             // const hasPattern = !prompt.Regex?.IsWhiteSpace() ?? false;
-            const hasPattern = new XString(prompt.Regex).IsNullOrWhiteSpace() == false
+            const hasPattern = String.xIsNullOrWhiteSpace(prompt.Regex) == false
             // console.log('just after use of string ext .IsWhiteSpace', 'has pattern = ', hasPattern)
 
             if (hasPattern)
@@ -60,17 +67,17 @@ export class ExecFromSheet
                 }
             }
 
-            vars.Ensure(varName, ans, true);
+            vars.xEnsure(varName, ans, true);
         }
-        while (vars.Contains(varName) == false)
+        while (vars.xContains(varName) == false)
     }
 
-    private async HandleMcqAsync(mcq: IMcq, vars: Dictionary<string, string>)
+    private async HandleMcqAsync(mcq: IMcq, vars: Map<string, string>)
     {
-        const plainOptions = this.CompileScript(mcq.OptionsComposer, vars) as string[]
+        const plainOptions = this.CompileScript(mcq.OptionsComposer, vars) as string[];
 
-        const options = new List<any>(plainOptions.map(op => ({ label: op })))
-        const intelli = new Intellisense(options.Items, (op) => op.label)
+        const options = plainOptions.xSelect(op => ({ label: op }));
+        const intelli = new Intellisense(options, (op) => op.label)
 
         const question = this.CompileScript(mcq.QuestionComposer, vars) as string
         const varName = this.CompileScript(mcq.VarNameComposer, vars) as string
@@ -78,16 +85,16 @@ export class ExecFromSheet
         TerminalAgent.ShowQuestion(question)
         const ans = await intelli.PromptAsync('>>>')
 
-        vars.Ensure(varName, ans.label, true)
+        vars.xEnsure(varName, ans.label, true)
     }
 
-    private CompileScript(composer: string, vars: Dictionary<string, string>): any
+    private CompileScript(composer: string, vars: Map<string, string>): string|string[]
     {
         let output = composer;
 
-        vars.Foreach((kv) =>
+        vars.xForeach((key) =>
         {
-            output = output.xReplaceAll(`<${kv.Key}>`, `${kv.Value}`)
+            output = output.xReplaceAll(`<${key}>`, `${vars.xGet(key)}`);
         })
 
         try
@@ -98,7 +105,7 @@ export class ExecFromSheet
                 if (func.constructor != Function)
                 {
                     TerminalAgent.ShowError(`Error evaluating expression: ${output} 98513`)
-                    return null;
+                    throw new Exception(`Error evaluating expression: ${output} 98513`);
                 }
                 return (func as Function).call([]);
             }
@@ -121,7 +128,7 @@ export class ExecFromSheet
 
     private _currentAggregation: string[] | null = null;
 
-    private async HandleAggregatorAsync(aggregator: IAggregator, vars: Dictionary<string, string>)
+    private async HandleAggregatorAsync(aggregator: IAggregator, vars: Map<string, string>)
     {
         this._currentAggregation = [];
         for (let step of aggregator.Steps)
@@ -130,12 +137,12 @@ export class ExecFromSheet
         }
 
         const finalCommand = this._currentAggregation.join('')
-        vars.Add(aggregator.OutputVarName, finalCommand)
+        vars.xAdd(aggregator.OutputVarName, finalCommand)
 
         this._currentAggregation = null;
     }
 
-    private async HandleRepeaterAsync(repeater: IRepeater, vars: Dictionary<string, string>)
+    private async HandleRepeaterAsync(repeater: IRepeater, vars: Map<string, string>)
     {
         while (true)
         {
@@ -153,20 +160,20 @@ export class ExecFromSheet
         }
     }
 
-    public async HandleCommandAsync(command: ICommand, vars: Dictionary<string, string>)
+    public async HandleCommandAsync(command: ICommand, vars: Map<string, string>)
     {
         const hintIsApplicable = this._currentAggregation == null && command.WillDoHintComposer
        
         // #region display hint if applicable
         if (hintIsApplicable)
         {
-            const hint = this.CompileScript(command.WillDoHintComposer, vars)
+            const hint = this.CompileScript(command.WillDoHintComposer, vars) as string;
             TerminalAgent.Hint(hint!)
         }
         // #endregion
 
         // #region compile and display command
-        const output = this.CompileScript(command.CommandComposer, vars);
+        const output = this.CompileScript(command.CommandComposer, vars) as string;
         TerminalAgent.ShowSuccess(output)
         // #endregion
 
@@ -190,7 +197,21 @@ export class ExecFromSheet
             const ans = await CommonMenu.ShowContinueSkipAsync('>>>')
             if (ans)
             {
-                TerminalAgent.Exec(output as string)
+                const commandParts = (output as string).split(/\s+/g)
+                if(commandParts.xCount() < 2 || 
+                   commandParts[0].toLowerCase() != "g")
+                {
+                    TerminalAgent.Exec(output as string)
+                }
+
+                const args = commandParts.length < 3? '' : commandParts.xSkip(2).join(' ');
+                const itWasLocalTool = this.srv_LocalToolsDispatcher.TryAimTool(commandParts[1], args);
+                
+                if(!itWasLocalTool)
+                {
+                    TerminalAgent.Exec(output as string)
+                }
+                
             }
             else
             {
@@ -200,7 +221,7 @@ export class ExecFromSheet
         // #endregion   
     }
 
-    private async HandleInstructionAsync(instruction: IInstruction, vars: Dictionary<string, string>)
+    private async HandleInstructionAsync(instruction: IInstruction, vars: Map<string, string>)
     {
         let output = await this.CompileScript(instruction.InstructionComposer, vars)
         TerminalAgent.Instruct(output as string)
@@ -216,7 +237,7 @@ export class ExecFromSheet
         }
     }
 
-    private async HandleStep(step: IStep, vars: Dictionary<string, string>)
+    private async HandleStep(step: IStep, vars: Map<string, string>)
     {
         if(!step) throw 'step argument cannot be null'
         if(!vars) throw 'vars argument cannot be null'
@@ -262,7 +283,7 @@ export class ExecFromSheet
         
         if (wk.IsCommentedOut) return;
 
-        const vars = new Dictionary<string, string>();
+        const vars = new Map<string, string>();
 
         for (let step of wk.Steps) 
         {     
@@ -270,10 +291,10 @@ export class ExecFromSheet
         };
     }
 
-    private WalkthroughFromLocalTool(localTool: ILocalTool): IWalkthrough
+    private WalkthroughFromLocalTool(localTool: AbstractLocalTool): IWalkthrough
     {
         return {
-            Title: `Gotcha >> Local Tool >> {g ${localTool.GetShortcut()}} ${localTool.GetHint()}`,
+            Title: `Ops >> Gotcha >> Local Tool >> {g ${localTool.GetShortcut()}} ${localTool.GetHint()}`,
             IsCommentedOut: false,
             Steps: [
                 {
@@ -297,30 +318,23 @@ export class ExecFromSheet
     public async TakeControlAsync(shortcut: string|null)
     {
         // #region load sheet's walkthroughs
-        while (WalkthroughsSheet.FileExists() == false)
+        while (this.srv_WalkthroughsSheet.FileExists() == false)
         {
             TerminalAgent.ShowError(`Walkthroughs sheet doesn't exist in the local repo!`)
-            await LocalToolsDispatcher.RunAsync(new LTool_CheckGotchaLocalRepo())
-            TerminalAgent.Hint(PathMan.GotchaLocalRepo_WalkthroughsSheet.FullName)
+            await LocalToolsDispatcher.RunAsync(new LTool_CheckOutGotchaLocalRepo())
+            TerminalAgent.Hint(this.srv_PathMan.GotchaLocalRepo_WalkthroughsSheet.FullName)
         }
 
         let allWks = WalkthroughsSheet.Singleton!.WalkthroughList;
         // #endregion
         
         // #region create walkthroughs from local tools to include them in all walkthroughs
-        const localToolsAsWalkthroughs = LocalToolsDispatcher.Singleton.RegisteredTools.Select(this.WalkthroughFromLocalTool);
-        try
-        {
-            allWks.AddRange(localToolsAsWalkthroughs);
-        }
-        catch (err)
-        {
-            console.log(err)
-        }
+        const localToolsAsWalkthroughs = this.srv_LocalToolsDispatcher.RegisteredTools.xSelect(this.WalkthroughFromLocalTool);
+        allWks.xAddRange(localToolsAsWalkthroughs);
         // #endregion
 
         // #region sort walkthroughs
-        allWks = allWks.Sort(w => w.Title);
+        allWks = allWks.xSort((w1, w2) => w1.Title.localeCompare(w2.Title));
         // #endregion
 
         // #region find and handle a walkthrough
@@ -335,9 +349,9 @@ export class ExecFromSheet
         // #endregion
     }
 
-    private async HandleWalkthroughOfShortcut(allWks: List<IWalkthrough>, shortcut: string)
+    private async HandleWalkthroughOfShortcut(allWks: IWalkthrough[], shortcut: string)
     {
-        const wk = allWks.FirstOrDefault(wk => wk.Shortcut?.toLowerCase() == shortcut.toLowerCase())
+        const wk = allWks.xFirstOrNull(wk => wk.Shortcut?.toLowerCase() == shortcut.toLowerCase())
         if(!wk)
         {
             Terminal.DisplayErrorAsync(`The shortcut [${shortcut}] wasn't recognized by Gotcha!`)
@@ -348,7 +362,7 @@ export class ExecFromSheet
         }
     }
 
-    private async PromptUserToPickAndRunWalkthrough(allWks: List<IWalkthrough>)
+    private async PromptUserToPickAndRunWalkthrough(allWks: IWalkthrough[])
     {
         const intelli = new Intellisense<IWalkthrough>(allWks, (op) => op.Title)
         let ans = await intelli.PromptAsync('>>>')

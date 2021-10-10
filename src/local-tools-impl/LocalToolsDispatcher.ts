@@ -1,30 +1,33 @@
-import { Dictionary, Exception, List } from "decova-dotnet-developer";
+import { Exception } from "decova-dotnet";
+import { singleton } from "tsyringe";
 import { TerminalAgent } from "../external-sheet/TerminalAgent";
 import { LTool_EditSnippets } from "./LTool_EditAugmenterFile";
 import { LTool_IncrementPatch } from "./LTool_IncrementPatch";
+import { AbstractLocalTool } from "./Techies/AbstractLocalTool";
 import { CommonMenu } from "./Techies/CommonMenu";
 
 
-export interface ILocalTool
-{
-    TakeControlAsync(args: string): Promise<void>;
+// export interface ILocalTool
+// {
+//     TakeControlAsync(args: string): Promise<void>;
 
-    GetHint(): string;
+//     GetHint(): string;
 
-    GetShortcut(): string;
-}
+//     GetShortcut(): string;
+// }
 
+@singleton()
 export class LocalToolsDispatcher
 {
     private static _singleton: LocalToolsDispatcher;
-    public static get Singleton(): LocalToolsDispatcher
-    {
-        if(this._singleton == null)
-        {
-            this._singleton = new LocalToolsDispatcher()
-        }
-        return this._singleton;
-    }
+    // public static get Singleton(): LocalToolsDispatcher
+    // {
+    //     if(this._singleton == null)
+    //     {
+    //         this._singleton = new LocalToolsDispatcher()
+    //     }
+    //     return this._singleton;
+    // }
 
     constructor()
     {
@@ -32,10 +35,10 @@ export class LocalToolsDispatcher
         LocalToolsDispatcher._singleton = this;
     }
 
-    private _local_tools_dictionary: Dictionary<string, ILocalTool> = 
-    new Dictionary<string, ILocalTool>();
+    private _local_tools_dictionary: Map<string, AbstractLocalTool> = 
+    new Map<string, AbstractLocalTool>();
 
-    public RegisterLocalTools( ... localTools: ILocalTool[])
+    public RegisterLocalTools( ... localTools: AbstractLocalTool[])
     {
         localTools.forEach(tool => 
             {
@@ -43,34 +46,34 @@ export class LocalToolsDispatcher
                 // #region ensure local tools dictionary
                 if(this._local_tools_dictionary == null)
                 {
-                    this._local_tools_dictionary = new Dictionary<string, ILocalTool>();
+                    this._local_tools_dictionary = new Map<string, AbstractLocalTool>();
                 }
                 // #endregion
             
                 // #region ensure unique shortcut
-                if(this._local_tools_dictionary.Contains(shortcut))
+                if(this._local_tools_dictionary.xContains(shortcut))
                     throw new Exception(`Local tool shortcut ${shortcut} is already registered!`);
                 // #endregion
             
-                this._local_tools_dictionary.Add(shortcut, tool);
+                this._local_tools_dictionary.xAdd(shortcut, tool);
             })
     }
 
     public async TryAimTool(shortcut: string, args: string): Promise<boolean>
     {
-        if(this._local_tools_dictionary.Contains(shortcut) == false)
+        if(this._local_tools_dictionary.xContains(shortcut) == false)
         {
             return false;
         }
         else
         {
-            const tool = this._local_tools_dictionary.Get(shortcut);
+            const tool = this._local_tools_dictionary.xGet(shortcut);
             await tool!.TakeControlAsync(args);
             return true;
         }
     }
 
-    public static async RunAsync(lTool: ILocalTool, args?: string)
+    public static async RunAsync(lTool: AbstractLocalTool, args?: string)
     {
         TerminalAgent.Hint(lTool.GetHint());
 
@@ -87,8 +90,8 @@ export class LocalToolsDispatcher
         }
     }
 
-    public get RegisteredTools(): List<ILocalTool>
+    public get RegisteredTools(): AbstractLocalTool[]
     {
-        return this._local_tools_dictionary.Values;
+        return this._local_tools_dictionary.xValues();
     }
 }

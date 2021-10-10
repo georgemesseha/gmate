@@ -4,15 +4,21 @@ import { Intellisense } from "../external-sheet/Intellisense";
 import { TerminalAgent } from "../external-sheet/TerminalAgent";
 import { ExternalResources } from "./ExternalResouces";
 import { GotchaRepo } from "./Techies/ArtifactMan/GotchaRepo";
-import { ILocalTool } from "./LocalToolsDispatcher";
+// import { ILocalTool } from "./LocalToolsDispatcher";
 
 import { PathMan } from "./Techies/PathMan";
+import { container, singleton } from "tsyringe";
+import { AbstractLocalTool } from "./Techies/AbstractLocalTool";
 
-export class LTool_CheckGotchaLocalRepo implements ILocalTool
+@singleton()
+export class LTool_CheckOutGotchaLocalRepo implements AbstractLocalTool
 {
+    private readonly srv_GotchaRepo = container.resolve(GotchaRepo);
+    private readonly srv_PathMan = container.resolve(PathMan);
+    
     GetHint(): string
     {
-        return `Pull Gotcha's data.`
+        return `ًGonna pull Gotcha's data.`
     }
     GetShortcut(): string
     {
@@ -20,26 +26,21 @@ export class LTool_CheckGotchaLocalRepo implements ILocalTool
     }
 
     
-
     async TakeControlAsync(args: string): Promise<void>
     {
-        if(PathMan.GotchaLocalRepoGitDir.Exists() == false)
+        if(!this.srv_PathMan.GotchaMainDir.Exists() || 
+           !this.srv_PathMan.GotchaMainDir.GetDirectories().xAny(d => d.Name === ".git"))
         {
-            await GotchaRepo.CloneAsync();
+            await this.srv_GotchaRepo.CloneAsync();
         }
-
-        // if(PathMan.GotchaLocalRepo.Exists() == false || PathMan.GotchaLocalRepo.GetFiles().Count == 0)
-        // {
-        //     await GotchaRepo.CloneAsync();        
-        // }
         else
         {
-            TerminalAgent.ShowQuestion('Gotcha repo exists, force update?')
-            const intelli = new Intellisense<string>(["Yes", "No"], op => op)
+            TerminalAgent.ShowQuestion('Gotcha repo exists, force update?');
+            const intelli = new Intellisense<string>(["Yes", "No"], op => op);
             const ans = await intelli.PromptAsync('>>>');
             if (ans == 'Yes')
             {
-               await GotchaRepo.PullAsync();
+               await this.srv_GotchaRepo.PullAsync();
             }
         }
         return Promise.resolve();

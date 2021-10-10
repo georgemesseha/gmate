@@ -1,9 +1,11 @@
 import { DirectoryInfo, FileInfo, Path } from "decova-filesystem";
+import { container } from "tsyringe";
 
 import { PathMan } from "../Techies/PathMan";
 
 export class PoykaConstants
 {
+    private readonly srv_PathMan = container.resolve(PathMan);
     private _projectDir = `G:\\_MyProjects\\_MyNodeProjects\\Poyka`;  
     
     public get ProjectDir(): DirectoryInfo
@@ -13,21 +15,21 @@ export class PoykaConstants
 
     public get VsCodeDir(): DirectoryInfo
     {
-        return PathMan.CurrentWorkspace_VsCodeDir
+        return this.srv_PathMan.CurrentWorkspace_VsCodeDir
     }
 
     public get SnippetsFile(): FileInfo
     {
-        return PathMan.CurrentWorkspace_DecovaSnippets
+        return this.srv_PathMan.CurrentWorkspace_DecovaSnippets
     }
 
     public get TasksFile(): FileInfo
     {
-        return PathMan.CurrentWorkspace_Tasks
+        return this.srv_PathMan.CurrentWorkspace_Tasks
     }
 
     public get SettingsFile(): FileInfo
     {
-        return PathMan.CurrentWorkspace_Settings
+        return this.srv_PathMan.CurrentWorkspace_Settings
     }
 }

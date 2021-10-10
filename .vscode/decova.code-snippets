@@ -1,26 +1,16 @@
 {
-    "Launch_Debug_Mocha": {
-        "prefix": "ss.mocha.launchSettings",
+    "unit-test describe": {
+        "prefix": "ss.unit-test.describe",
         "body": [
+            "describe('description', () =>\r",
             "{\r",
-            "    \"type\": \"node\",\r",
-            "    \"request\": \"launch\",\r",
-            "    \"name\": \"Mocha All\",\r",
-            "    \"program\": \"${workspaceFolder}/node_modules/mocha/bin/_mocha\",\r",
-            "    \"args\": [\r",
-            "        \"-r\",\r",
-            "        \"ts-node/register\",\r",
-            "        \"--timeout\",\r",
-            "        \"999999\",\r",
-            "        \"--colors\",\r",
-            "        \"${workspaceFolder}/modules/**/*-spec.ts\",\r",
-            "    ],\r",
-            "    \"console\": \"integratedTerminal\",\r",
-            "    \"internalConsoleOptions\": \"neverOpen\",\r",
-            "    \"protocol\": \"inspector\"\r",
-            "}"
+            "    it('description', () =>\r",
+            "    {\r",
+            "        console.log('hello from mocha')\r",
+            "    })\r",
+            "})"
         ],
-        "description": "A launch configuration that configure launching mocha test in debug mode"
+        "description": "Generates a decribe snippet in TypeScript unit test spec file"
     },
     "Terminal Mcq Prompt": {
         "prefix": "ss.terminal.mcq", // the snippet suggestion code editor show up for you.

@@ -1,4 +1,4 @@
-
+import 'reflect-metadata';
 import 'decova-dotnet'
 import chalk from "chalk";
 import { Process } from "decova-environment";
@@ -9,22 +9,27 @@ import Main from './Main'
 import { QuickCommands } from "./local-tools-impl/__old/QuickCommands";
 import { WorkspaceAugmenter } from "./local-tools-impl/Techies/DecovaSpecific/WorkspaceAugmenter";
 import { LocalToolsDispatcher } from "./local-tools-impl/LocalToolsDispatcher";
-import { KeyValuePair, XString } from "decova-dotnet-developer";
 import { LTool_IncrementPatch } from "./local-tools-impl/LTool_IncrementPatch";
 import { DirectoryInfo } from "decova-filesystem";
-import { LTool_CheckGotchaLocalRepo } from "./local-tools-impl/LTool_CheckGotchaLocalRepo";
-import { LTool_EditWalkthroughs, 
-         LTool_EditSnippets, 
-         LTool_EditLaunchFile } from "./local-tools-impl/LTool_EditAugmenterFile";
+import { LTool_CheckOutGotchaLocalRepo } from "./local-tools-impl/LTool_CheckGotchaLocalRepo";
+import
+    {
+        LTool_EditWalkthroughs,
+        LTool_EditSnippets,
+        LTool_EditLaunchFile
+    } from "./local-tools-impl/LTool_EditAugmenterFile";
 import { LTool_ManageTextSnippets } from "./local-tools-impl/LTool_ManageTextSnippets";
 import { LTool_OpenTextSnippet } from "./local-tools-impl/LTool_OpenTextSnippet";
 import { LTool_CommitAndPushGotchaData } from './local-tools-impl/LTool_CommitAndPushGotchaData';
 import { LTool_CopyVscodeFile } from './local-tools-impl/LTool_CopyVscodeFile';
+import { container } from 'tsyringe';
 
 const pjson = require('../package.json');
 
 export class App
 {
+
+    private readonly srv_LocalToolsDispatcher = container.resolve(LocalToolsDispatcher);
     private ShowStartupInfo()
     {
         console.log
@@ -44,50 +49,57 @@ export class App
 
     private RegisterLocalTools(): void
     {
-        LocalToolsDispatcher.Singleton.RegisterLocalTools
+        this.srv_LocalToolsDispatcher.RegisterLocalTools
             (
-                new LTool_IncrementPatch(),
-                new LTool_CheckGotchaLocalRepo(),
-                new LTool_EditWalkthroughs(),
-                new LTool_EditSnippets(),
-                new LTool_EditLaunchFile(),
-                new LTool_ManageTextSnippets(),
-                new LTool_OpenTextSnippet(),
-                new LTool_CommitAndPushGotchaData(),
-                new LTool_CopyVscodeFile()
+                container.resolve(LTool_IncrementPatch),
+                container.resolve(LTool_CheckOutGotchaLocalRepo),
+                container.resolve(LTool_EditWalkthroughs),
+                container.resolve(LTool_EditSnippets),
+                container.resolve(LTool_EditLaunchFile),
+                container.resolve(LTool_ManageTextSnippets),
+                container.resolve(LTool_OpenTextSnippet),
+                container.resolve(LTool_CommitAndPushGotchaData),
+                container.resolve(LTool_CopyVscodeFile)
             )
     }
 
     private async DispatchAsync()
     {
-        const arg0 = Process.Current.Args.FirstOrDefault();
+        const arg0 = Process.Current.Args.xFirstOrNull();
         if (arg0)
         {
             // #region try local tool first
-            const nextArgs = XString.Join('', Process.Current.Args.Skip(1).Items);
-            const isLocalTool = await LocalToolsDispatcher.Singleton.TryAimTool(arg0, nextArgs.Value);
+            const nextArgs = String.xJoin('', Process.Current.Args.xSkip(1));
+            const isLocalTool = await this.srv_LocalToolsDispatcher.TryAimTool(arg0, nextArgs);
             // #endregion
 
             // #region if it's not a local tool, consult sheet
             if (isLocalTool == false)
             {
-                new ExecFromSheet().TakeControlAsync(Process.Current.Args.FirstOrDefault())
+                new ExecFromSheet().TakeControlAsync(Process.Current.Args.xFirstOrNull())
             }
             // #endregion
         }
         else
         {
             // #region consult sheet
-            new ExecFromSheet().TakeControlAsync(Process.Current.Args.FirstOrDefault())
+            new ExecFromSheet().TakeControlAsync(Process.Current.Args.xFirstOrNull())
             // #endregion
         }
     }
 
     public async StartAsync()
     {
-        this.ShowStartupInfo();
-        this.RegisterLocalTools();
-        await this.DispatchAsync();
+        try
+        {
+            this.ShowStartupInfo();
+            this.RegisterLocalTools();
+            await this.DispatchAsync();
+        } 
+        catch (err)
+        {
+            console.error(err);
+        }
     }
 }
 
@@ -95,8 +107,8 @@ export class App
 try
 {
     new App().StartAsync();
-} 
+}
 catch (err)
 {
-    console.log(err)
+    console.error(err)
 }

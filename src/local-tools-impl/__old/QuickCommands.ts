@@ -1,4 +1,3 @@
-import { List } from "decova-dotnet-developer";
 import { Json } from "decova-json";
 import { Process } from "decova-environment";
 import { DirectoryInfo } from "decova-filesystem";
@@ -26,7 +25,7 @@ export class QuickCommands
    
     public static async HandleQuickCommand()
     {
-        switch(Process.Current.Args.ItemAt(0).toLowerCase())
+        switch(Process.Current.Args.xItemAt(0).toLowerCase())
         {
             case Command.incrementPatch:
                 await this.IncrementPackagePatch();

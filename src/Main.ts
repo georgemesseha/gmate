@@ -1,6 +1,7 @@
 //import ch from "chalk";
 // import figlet from "figlet";
 //import * as cp from "child_process"
+
 import { Terminal } from "./Hub";
 import { DevelopMyPackages } from "./local-tools-impl/__old/DevelopMyPackages";
 import { DevelopMyTools } from "./local-tools-impl/__old/DevelopMyTools";
@@ -8,14 +9,9 @@ import { InsideExistingProject as InsideCurrentProject } from "./local-tools-imp
 import { NewProject } from "./local-tools-impl/__old/NewProject";
 import { DirectoryInfo, FileInfo } from "decova-filesystem";
 import * as inquirer from "inquirer";
-import { Dictionary, XString } from "decova-dotnet-developer";
-import { Exception } from "decova-dotnet-developer";
-
-
-
 import path from "path";
 import { WorkspaceAugmenter as WorkspaceAugmenter } from "./local-tools-impl/Techies/DecovaSpecific/WorkspaceAugmenter";
-import { List } from "decova-dotnet-developer";
+
 import { Intellisense } from "./external-sheet/Intellisense";
 import { StepType } from "./external-sheet/StepType";
 import { ICmdSheet } from "./external-sheet/ICmdSheet";
@@ -25,6 +21,7 @@ import { underline } from "chalk";
 
 import { Process } from "decova-environment";
 import { ExecFromSheet } from "./external-sheet/ExecFromSheet";
+import { container } from "tsyringe";
 
 
 
@@ -55,11 +52,11 @@ export default class Main
                 break;
 
             case ops.developYourTools:
-                await DevelopMyTools.TakeControl();
+                await container.resolve(DevelopMyTools).TakeControl();
                 break;
 
             case ops.developYourPackages:
-                await DevelopMyPackages.TakeControl();
+                await container.resolve(DevelopMyPackages).TakeControl();
                 break;
 
             case ops.createProject:
@@ -76,19 +73,12 @@ export default class Main
     {
         try
         {
-            if (Process.Current.Args.Any())
-            {
-                await new ExecFromSheet().TakeControlAsync(Process.Current.Args.First());
-            }
-            else
-            {
-                await new ExecFromSheet().TakeControlAsync(null);
-            }
+            await new ExecFromSheet().TakeControlAsync(Process.Current.Args.xFirstOrNull());
         } 
         catch (err)
         {
             console.log('//////////////////////////////////////////////////////////////// error')
-            await Terminal.DisplayErrorAsync(err)
+            await Terminal.DisplayErrorAsync(err as string)
             process.abort()
         }
     }

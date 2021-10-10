@@ -1,4 +1,3 @@
-import { List, XString } from "decova-dotnet-developer";
 import { CurrentTerminal as Terminal } from "decova-terminal";
 import * as inquirer from "inquirer"
 
@@ -9,21 +8,21 @@ export class Intellisense<TOption>
 {
     private _plainOptions: string[] = [];
 
-    constructor(private _options: List<TOption>|TOption[], 
+    constructor(private _options: TOption[], 
                 private _displaySelector:DlgTextRepresenter<TOption>)
     {
-        if(this._options.constructor != List)
-        {
-            this._options = new List<TOption>(this._options as TOption[]);
-        }
-        this._plainOptions = this._options.Select(op => this._displaySelector(op as TOption)).Where(display => !!display).Items;
+        // if(this._options.constructor != List)
+        // {
+        //     this._options = new List<TOption>(this._options as TOption[]);
+        // }
+        this._plainOptions = this._options.xSelect(op => this._displaySelector(op as TOption)).xWhere(display => !!display);
     }
 
     private FilterOptions(options:string[], searchString: string): string[]
     {
-        if(new XString(searchString).IsNullOrWhiteSpace()) return options;
-        const keys = new List<string>(searchString.split(" ")).Select(s => s.trim().toLowerCase())
-        const output = new List<string>(options).Where(op => keys.All(k => op.toLowerCase().indexOf(k) >= 0)).Items;
+        if(!searchString) return options;
+        const keys = searchString.split(" ").xSelect(s => s.trim().toLowerCase())
+        const output = options.xWhere(op => keys.xAll(k => op.toLowerCase().indexOf(k) >= 0));
         return output;
     }
 
@@ -35,8 +34,7 @@ export class Intellisense<TOption>
             require('inquirer-autocomplete-prompt')
         );
         
-        const answer = await inquirer
-        .prompt
+        const answer = await inquirer.prompt
         ([
             {
                 type: 'autocomplete',
@@ -45,7 +43,7 @@ export class Intellisense<TOption>
                 message: prompt,
                 source: (answersSoFar:string[], input:string) => 
                 {
-                    return this.FilterOptions(this._plainOptions, input)//.map(i=>({desc: i}))
+                    return this.FilterOptions(this._plainOptions, input);
                 }
             }
         ]);
@@ -56,7 +54,7 @@ export class Intellisense<TOption>
 
     public async PromptAsync(prompt: string): Promise<TOption>
     {
-        const selectedPlain = await(this.PromptPlainAsync(prompt))
-        return (this._options as List<TOption>).First(op => this._displaySelector(op) == selectedPlain)
+        const selectedPlain = await(this.PromptPlainAsync(prompt));
+        return this._options.xFirst(op => this._displaySelector(op) == selectedPlain);
     }
 }

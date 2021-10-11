@@ -10,7 +10,7 @@
 	"outDir": "",
 	"scripts": {
 		"start": "tsc & node ./dist/app.js",
-		"test": "tsc & npm publish & npm i -g poyka & ggg",
+		"test": "mocha --check-leaks -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts",
 		"build": "tsc & node ./dist/app.js",
 		"push": "tsc & npm publish & npm i -g poyka & ggg"
 	},
@@ -51,13 +51,24 @@
 		"ggg": "./index.js"
 	},
 	"devDependencies": {
+		"@types/chai": "^4.2.22",
 		"@types/figlet": "^1.2.0",
 		"@types/inquirer": "^6.5.0",
 		"@types/jasmine": "^3.5.10",
+		"@types/mocha": "^9.0.0",
+		"@types/node": "^16.10.3",
 		"@types/semver": "^7.3.4",
+		"@types/supertest": "^2.0.11",
+		"chai": "^4.3.4",
 		"jasmine": "^3.5.0",
+		"mocha": "^9.1.2",
+		"nodemon": "^2.0.13",
 		"prettier": "^2.0.5",
+		"supertest": "^6.1.6",
+		"ts-node": "^10.2.1",
+		"tsconfig-paths": "^3.11.0",
 		"tslint": "^6.1.2",
-		"tslint-config-prettier": "^1.18.0"
+		"tslint-config-prettier": "^1.18.0",
+		"typescript": "^4.4.3"
 	}
 }
